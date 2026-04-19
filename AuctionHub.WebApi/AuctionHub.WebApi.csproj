@@ -23,11 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Endpoints\" />
-    <Folder Include="Extensions\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\AuctionHub.Application\AuctionHub.Application.csproj" />
     <ProjectReference Include="..\AuctionHub.Infrastructure\AuctionHub.Infrastructure.csproj" />
   </ItemGroup>

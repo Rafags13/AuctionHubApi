@@ -1,8 +1,9 @@
 services:
   auctionhub.webapi:
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ASPNETCORE_HTTP_PORTS=${ASPNETCORE_HTTP_PORTS}
+      - PASSWORD_HASH=${PASSWORD_HASH}
     ports:
       - "8080"
   db:

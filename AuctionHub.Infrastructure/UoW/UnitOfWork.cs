@@ -1,11 +1,15 @@
-﻿using AuctionHub.Domain.Interfaces.UoW;
+﻿using AuctionHub.Domain.Interfaces.Repositories;
+using AuctionHub.Domain.Interfaces.UoW;
 using AuctionHub.Infrastructure.Context;
+using AuctionHub.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace AuctionHub.Infrastructure.UoW
 {
     internal sealed class UnitOfWork(AuctionHubContext context) : IUnitOfWork
     {
+        public IUserRepository UserRepository { get; private set; } = new UserRepository(context);
+
         public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken ct)
         {
             return context.Database.BeginTransactionAsync(ct);

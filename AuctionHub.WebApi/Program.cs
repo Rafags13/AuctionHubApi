@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json.Serialization;
-using AuctionHub.Application.Extensions.Services;
 using AuctionHub.Infrastructure.Extensions;
+using AuctionHub.Application.Extensions.UseCases;
+using AuctionHub.WebApi.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
-
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -20,7 +20,8 @@ builder.Services.Configure<JsonOptions>(options =>
 });
 
 builder.Services
-    .AddApplicationServices()
+    .AddServices()
+    .AddUseCases()
     .ConfigureInfrastructure(builder.Configuration);
 
 var app = builder.Build();
@@ -36,5 +37,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.Services.ConfigureMigrations();
+
+app.AddEndpoints();
 
 app.Run();
