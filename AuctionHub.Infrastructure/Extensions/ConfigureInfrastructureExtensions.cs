@@ -1,4 +1,5 @@
-﻿using AuctionHub.Domain.Constants.User.Password;
+﻿using AuctionHub.Domain.Constants.User.Login;
+using AuctionHub.Domain.Constants.User.Password;
 using AuctionHub.Domain.Interfaces.Repositories;
 using AuctionHub.Domain.Interfaces.UoW;
 using AuctionHub.Infrastructure.Context;
@@ -44,6 +45,10 @@ namespace AuctionHub.Infrastructure.Extensions
             PasswordConstants.HASH = Environment.GetEnvironmentVariable("PASSWORD_HASH") ??
                 configuration.GetConnectionString("CONTEXT_DATA_SOURCE") ??
                 throw new ArgumentNullException("Não foi possível encontrar a variável de ambiente PASSWORD_HASH");
+
+            AuthenticationJwtConstants.SECRET_KEY = Environment.GetEnvironmentVariable("JWT_SECRET_KEY") ??
+                configuration.GetConnectionString("JWT_SECRET_KEY") ??
+                throw new ArgumentNullException("Não foi possível encontrar a variável de ambiente JWT_SECRET_KEY");
 
             return services;
         }

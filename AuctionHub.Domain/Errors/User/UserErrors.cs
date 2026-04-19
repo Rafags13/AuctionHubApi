@@ -9,4 +9,5 @@ namespace AuctionHub.Domain.Errors.User
     public record NameIsRequiredError(): BaseError("The name field is required.", nameof(NameIsRequiredError), StatusCodes.Status400BadRequest);
     public record EmailIsRequiredError(): BaseError("The email field is required.", nameof(EmailIsRequiredError), StatusCodes.Status400BadRequest);
     public record PasswordIsRequiredError(): BaseError("The password field is required.", nameof(PasswordIsRequiredError), StatusCodes.Status400BadRequest);
+    public record UserOrPasswordIsIncorrectError() : BaseError("The email or password provided is incorrect.", nameof(UserOrPasswordIsIncorrectError), StatusCodes.Status401Unauthorized);
 }

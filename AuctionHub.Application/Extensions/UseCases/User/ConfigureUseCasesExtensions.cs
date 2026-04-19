@@ -10,6 +10,7 @@ namespace AuctionHub.Application.Extensions.UseCases.User
         {
             services.AddTransient<IRegisterSellerUseCase, RegisterSellerUseCase>();
             services.AddTransient<IRegisterBidderUseCase, RegisterBidderUseCase>();
+            services.AddTransient<IUserLoginUseCase, UserLoginUseCase>();
 
             return services;
         }

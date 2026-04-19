@@ -1,4 +1,5 @@
 ﻿using AuctionHub.Domain.DTOs.User.Request.Create;
+using AuctionHub.Domain.DTOs.User.Request.Login;
 using AuctionHub.Domain.Errors.Common;
 using AuctionHub.Domain.Interfaces.UseCases.User.Commands;
 using Microsoft.AspNetCore.Mvc;
@@ -47,6 +48,23 @@ namespace AuctionHub.WebApi.Endpoints.User
                 .Produces<bool>(StatusCodes.Status200OK)
                 .Produces<BaseError>(StatusCodes.Status400BadRequest)
                 .Produces<BaseError>(StatusCodes.Status500InternalServerError);
+
+            root.MapPost("login", async (
+                [FromServices] IUserLoginUseCase useCase,
+                [FromBody] RequestUserLoginDTO body,
+                CancellationToken cancellationToken = default
+            ) =>
+            {
+                var result = await useCase.LoginAsync(body, cancellationToken);
+
+                return result.Match(
+                    success => Results.Ok(success),
+                    error => Results.Json(error, statusCode: error.HttpErrorCode)
+                );
+            })
+                .WithDescription("Log-in an user.")
+                .Produces<string>(StatusCodes.Status200OK)
+                .Produces<BaseError>(StatusCodes.Status401Unauthorized);
 
             return endpoints;
         }

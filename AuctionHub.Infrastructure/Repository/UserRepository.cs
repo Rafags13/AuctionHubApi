@@ -1,4 +1,5 @@
 ﻿using AuctionHub.Domain.DTOs.User.Request.Create;
+using AuctionHub.Domain.DTOs.User.Request.Login;
 using AuctionHub.Domain.Entities;
 using AuctionHub.Domain.Interfaces.Repositories;
 using AuctionHub.Infrastructure.Context;
@@ -20,6 +21,13 @@ namespace AuctionHub.Infrastructure.Repository
         public Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken = default)
         {
             return context.Users.AnyAsync(u => u.Email == email, cancellationToken);
+        }
+
+        public Task<RequestGenerateTokenDTO?> GetUserByCredentialsAsync(RequestUserLoginDTO content, CancellationToken cancellationToken = default)
+        {
+            return context.Users.Where(u => u.Email == content.Email && u.PasswordHash == content.Password)
+                .Select(u => new RequestGenerateTokenDTO(u.Id, u.Name, u.Role))
+                .FirstOrDefaultAsync(cancellationToken);
         }
     }
 }
