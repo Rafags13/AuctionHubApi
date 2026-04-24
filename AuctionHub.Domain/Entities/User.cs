@@ -1,4 +1,5 @@
-﻿using AuctionHub.Domain.DTOs.User.Request.Create;
+﻿using AuctionHub.Domain.DTOs.User.Common;
+using AuctionHub.Domain.DTOs.User.Request.Create;
 using AuctionHub.Domain.Enums.User;
 
 namespace AuctionHub.Domain.Entities
@@ -10,8 +11,8 @@ namespace AuctionHub.Domain.Entities
         public string PasswordHash { get; private set; } = string.Empty;
         public ERole Role { get; init; }
         public EUserStatus Status { get; init; }
-        public string? RefreshToken { get; init; }
-        public DateTime? ExpirationRefreshToken { get; init; }
+        public string? RefreshToken { get; private set; }
+        public DateTime? ExpirationRefreshToken { get; private set; }
 
         protected User() { }
 
@@ -47,6 +48,12 @@ namespace AuctionHub.Domain.Entities
         public void SetPassword(string password)
         {
             PasswordHash = password;
+        }
+
+        public void Refresh(RefreshTokenDTO content)
+        {
+            RefreshToken = content.RefreshToken;
+            ExpirationRefreshToken = content.ExpiresAt;
         }
         #endregion
     }

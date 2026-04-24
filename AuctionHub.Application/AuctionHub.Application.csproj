@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AuctionHub.Domain\AuctionHub.Domain.csproj" />
+    <ProjectReference Include="..\AuctionHub.Infrastructure\AuctionHub.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,10 @@
-﻿using AuctionHub.Domain.DTOs.User.Request.Create;
+﻿using AuctionHub.Domain.DTOs.User.Common;
+using AuctionHub.Domain.DTOs.User.Request.Create;
 using AuctionHub.Domain.DTOs.User.Request.Login;
+using AuctionHub.Domain.DTOs.User.Request.Toggle;
+using AuctionHub.Domain.DTOs.User.Response.RefreshToken;
 using AuctionHub.Domain.Entities;
+using AuctionHub.Domain.Enums.User;
 using AuctionHub.Domain.Interfaces.Repositories;
 using AuctionHub.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
@@ -23,11 +27,37 @@ namespace AuctionHub.Infrastructure.Repository
             return context.Users.AnyAsync(u => u.Email == email, cancellationToken);
         }
 
+        public Task<ResponseRefreshTokenDTO?> GetRefreshInformationsAsync(string refreshToken, CancellationToken cancellationToken = default)
+        {
+            return context.Users.Where(u => u.RefreshToken == refreshToken && u.ExpirationRefreshToken.HasValue)
+                .Select(u => new ResponseRefreshTokenDTO(u.Id, u.ExpirationRefreshToken.Value))
+                .FirstOrDefaultAsync(cancellationToken);
+        }
+
         public Task<RequestGenerateTokenDTO?> GetUserByCredentialsAsync(RequestUserLoginDTO content, CancellationToken cancellationToken = default)
         {
             return context.Users.Where(u => u.Email == content.Email && u.PasswordHash == content.Password)
-                .Select(u => new RequestGenerateTokenDTO(u.Id, u.Name, u.Role))
+                .Select(u => new RequestGenerateTokenDTO(u.Id, u.Name, u.Role, u.Status))
                 .FirstOrDefaultAsync(cancellationToken);
+        }
+
+        public async Task<bool> RefreshTokenAsync(RefreshTokenDTO content, long userId, CancellationToken cancellationToken = default)
+        {
+            var user = await context.Users.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+            if (user == null)
+                return false;
+
+            user.Refresh(content);
+
+            return await context.SaveChangesAsync(cancellationToken) > 0;
+        }
+
+        public Task<int> ToggleAsync(ToggleUserStatusDTO content, CancellationToken cancellationToken = default)
+        {
+            return context.Users
+                .Where(u => u.Id == content.UserId)
+                .ExecuteUpdateAsync(u => u
+                    .SetProperty(p => p.Status, content.Status), cancellationToken);
         }
     }
 }

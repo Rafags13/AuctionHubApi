@@ -10,4 +10,8 @@ namespace AuctionHub.Domain.Errors.User
     public record EmailIsRequiredError(): BaseError("The email field is required.", nameof(EmailIsRequiredError), StatusCodes.Status400BadRequest);
     public record PasswordIsRequiredError(): BaseError("The password field is required.", nameof(PasswordIsRequiredError), StatusCodes.Status400BadRequest);
     public record UserOrPasswordIsIncorrectError() : BaseError("The email or password provided is incorrect.", nameof(UserOrPasswordIsIncorrectError), StatusCodes.Status401Unauthorized);
+    public record UserIsBannedError() : BaseError("Current user is permanently banned.", nameof(UserIsBannedError), StatusCodes.Status403Forbidden);
+    public record UserNotFoundError() : BaseError("User not found.", nameof(UserNotFoundError), StatusCodes.Status404NotFound);
+    public record InvalidRefreshTokenError() : BaseError("Invalid token.", nameof(InvalidRefreshTokenError), StatusCodes.Status401Unauthorized);
+    public record ExpiredRefreshTokenError() : BaseError("Expired token.", nameof(ExpiredRefreshTokenError), StatusCodes.Status401Unauthorized);
 }
