@@ -1,0 +1,12 @@
+﻿using AuctionHub.Domain.Errors.Common.Base;
+using Microsoft.AspNetCore.Http;
+
+namespace AuctionHub.Domain.Errors.Authentication.Register
+{
+    public record UserAlreadyExistsError() : BaseError("User with the same email already exists.", nameof(BaseError), StatusCodes.Status400BadRequest);
+    public record InvalidEmailFormatError() : BaseError("The provided email format is invalid.", nameof(InvalidEmailFormatError), StatusCodes.Status400BadRequest);
+    public record WeakPasswordError() : BaseError("The provided password does not meet the strength requirements.", nameof(WeakPasswordError), StatusCodes.Status400BadRequest);
+    public record NameIsRequiredError() : BaseError("The name field is required.", nameof(NameIsRequiredError), StatusCodes.Status400BadRequest);
+    public record EmailIsRequiredError() : BaseError("The email field is required.", nameof(EmailIsRequiredError), StatusCodes.Status400BadRequest);
+    public record PasswordIsRequiredError() : BaseError("The password field is required.", nameof(PasswordIsRequiredError), StatusCodes.Status400BadRequest);
+}

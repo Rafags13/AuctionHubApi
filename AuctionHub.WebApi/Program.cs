@@ -1,13 +1,33 @@
-using Microsoft.AspNetCore.Mvc;
-using System.Text.Json.Serialization;
-using AuctionHub.Application.Extensions.Services;
+using AuctionHub.Application.Extensions.UseCases;
 using AuctionHub.Infrastructure.Extensions;
+using AuctionHub.WebApi.Extensions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Digite apenas o token"
+    });
+
+    options.AddSecurityRequirement(doc => new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecuritySchemeReference("Bearer", doc),
+            []
+        }
+    });
+});
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
@@ -20,8 +40,11 @@ builder.Services.Configure<JsonOptions>(options =>
 });
 
 builder.Services
-    .AddApplicationServices()
+    .AddServices()
+    .AddUseCases()
     .ConfigureInfrastructure(builder.Configuration);
+
+builder.Services.ConfigureAuthorization();
 
 var app = builder.Build();
 
@@ -36,5 +59,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.Services.ConfigureMigrations();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.AddEndpoints();
 
 app.Run();
