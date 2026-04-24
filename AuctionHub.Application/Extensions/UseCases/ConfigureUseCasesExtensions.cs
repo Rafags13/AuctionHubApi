@@ -1,4 +1,5 @@
-﻿using AuctionHub.Application.Extensions.UseCases.User;
+﻿using AuctionHub.Application.Extensions.UseCases.Authentication;
+using AuctionHub.Application.Extensions.UseCases.User;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AuctionHub.Application.Extensions.UseCases
@@ -7,7 +8,9 @@ namespace AuctionHub.Application.Extensions.UseCases
     {
         public static IServiceCollection AddUseCases(this IServiceCollection services)
         {
-            return services.AddUserUseCases();
+            return services
+                .AddAuthenticationUseCases()
+                .AddUserUseCases();
         }
     }
 }

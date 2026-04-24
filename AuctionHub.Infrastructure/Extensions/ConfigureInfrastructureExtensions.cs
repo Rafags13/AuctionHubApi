@@ -1,5 +1,5 @@
-﻿using AuctionHub.Domain.Constants.User.Login;
-using AuctionHub.Domain.Constants.User.Password;
+﻿using AuctionHub.Domain.Constants.Authentication.Login;
+using AuctionHub.Domain.Constants.Authentication.Password;
 using AuctionHub.Domain.Interfaces.Repositories;
 using AuctionHub.Domain.Interfaces.UoW;
 using AuctionHub.Infrastructure.Context;

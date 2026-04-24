@@ -1,7 +1,8 @@
-﻿using AuctionHub.Domain.DTOs.User.Request.Create;
-using AuctionHub.Domain.Errors.Common;
-using AuctionHub.Domain.Errors.User;
+﻿using AuctionHub.Domain.DTOs.Authentication.Register.Request;
+using AuctionHub.Domain.Errors.Authentication.Register;
+using AuctionHub.Domain.Errors.Common.Base;
 using AuctionHub.Domain.Helpers;
+using AuctionHub.Domain.Helpers.Autentication;
 using AuctionHub.Domain.Interfaces.Services.User.Register;
 using AuctionHub.Domain.Interfaces.UoW;
 
@@ -9,7 +10,7 @@ namespace AuctionHub.Infrastructure.Services.User.Register
 {
     internal sealed class ValidateRegisterService(IUnitOfWork unitOfWork) : IValidateRegisterService
     {
-        public async Task<BaseError?> ValidateAsync(RequestCreateUserDTO content, CancellationToken cancellationToken)
+        public async Task<BaseError?> ValidateAsync(RequestRegisterUserDTO content, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(content.Name))
                 return new NameIsRequiredError();

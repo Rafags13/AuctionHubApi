@@ -1,4 +1,4 @@
-﻿using AuctionHub.Domain.Errors.Common;
+﻿using AuctionHub.Domain.Errors.Common.Base;
 using OneOf;
 
 namespace AuctionHub.Infrastructure.Extensions

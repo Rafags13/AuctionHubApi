@@ -1,4 +1,5 @@
-﻿using AuctionHub.WebApi.Endpoints.User;
+﻿using AuctionHub.WebApi.Endpoints.Authentication;
+using AuctionHub.WebApi.Endpoints.User;
 
 namespace AuctionHub.WebApi.Extensions
 {
@@ -6,7 +7,9 @@ namespace AuctionHub.WebApi.Extensions
     {
         internal static IEndpointRouteBuilder AddEndpoints(this IEndpointRouteBuilder endpoint)
         {
-            return endpoint.AddUserEndpoints();
+            return endpoint
+                .MapAuthenticationEndpoints()
+                .AddUserEndpoints();
         }
     }
 }

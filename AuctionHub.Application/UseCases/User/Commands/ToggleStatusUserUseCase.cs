@@ -1,6 +1,6 @@
-﻿using AuctionHub.Domain.DTOs.User.Request.Toggle;
-using AuctionHub.Domain.Errors.Common;
-using AuctionHub.Domain.Errors.User;
+﻿using AuctionHub.Domain.DTOs.User.Toggle.Request;
+using AuctionHub.Domain.Errors.Common.Base;
+using AuctionHub.Domain.Errors.Common.User;
 using AuctionHub.Domain.Interfaces.UoW;
 using AuctionHub.Domain.Interfaces.UseCases.User.Commands;
 using OneOf;
@@ -11,13 +11,13 @@ namespace AuctionHub.Application.UseCases.User.Commands
         IUnitOfWork unitOfWork
     ) : IToggleStatusUserUseCase
     {
-        public async Task<OneOf<bool, BaseError>> ToggleAsync(ToggleUserStatusDTO content, CancellationToken cancellationToken = default)
+        public async Task<OneOf<bool, BaseError>> ToggleAsync(RequestToggleUserStatusDTO content, CancellationToken cancellationToken = default)
         {
             if (!await unitOfWork.UserRepository.AnyAsync(u => u.Id == content.UserId, cancellationToken))
                 return new UserNotFoundError();
 
             if(await unitOfWork.UserRepository.ToggleAsync(content, cancellationToken) <= 0)
-                return new UserNotFoundError();
+                return new DatabaseError();
 
             return true;
         }

@@ -1,8 +1,8 @@
-﻿using AuctionHub.Domain.DTOs.User.Common;
-using AuctionHub.Domain.DTOs.User.Request.Create;
+﻿using AuctionHub.Domain.DTOs.Authentication.RefreshToken.Response;
+using AuctionHub.Domain.DTOs.Authentication.Register.Request;
+using AuctionHub.Domain.DTOs.User.Common;
 using AuctionHub.Domain.DTOs.User.Request.Login;
-using AuctionHub.Domain.DTOs.User.Request.Toggle;
-using AuctionHub.Domain.DTOs.User.Response.RefreshToken;
+using AuctionHub.Domain.DTOs.User.Toggle.Request;
 using AuctionHub.Domain.Entities;
 using AuctionHub.Domain.Enums.User;
 using AuctionHub.Domain.Interfaces.Repositories;
@@ -13,7 +13,7 @@ namespace AuctionHub.Infrastructure.Repository
 {
     internal sealed class UserRepository(AuctionHubContext context) : BaseRepository<User>(context), IUserRepository
     {
-        public async Task<bool> CreateAsync(RequestCreateUserDTO content, string hashedPassword, CancellationToken cancellationToken = default)
+        public async Task<bool> CreateAsync(RequestRegisterUserDTO content, string hashedPassword, CancellationToken cancellationToken = default)
         {
             var user = User.Create(content, hashedPassword);
 
@@ -52,7 +52,7 @@ namespace AuctionHub.Infrastructure.Repository
             return await context.SaveChangesAsync(cancellationToken) > 0;
         }
 
-        public Task<int> ToggleAsync(ToggleUserStatusDTO content, CancellationToken cancellationToken = default)
+        public Task<int> ToggleAsync(RequestToggleUserStatusDTO content, CancellationToken cancellationToken = default)
         {
             return context.Users
                 .Where(u => u.Id == content.UserId)

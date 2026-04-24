@@ -8,11 +8,7 @@ namespace AuctionHub.Application.Extensions.UseCases.User
     {
         internal static IServiceCollection AddUserUseCases(this IServiceCollection services)
         {
-            services.AddTransient<IRegisterSellerUseCase, RegisterSellerUseCase>();
-            services.AddTransient<IRegisterBidderUseCase, RegisterBidderUseCase>();
-            services.AddTransient<IUserLoginUseCase, UserLoginUseCase>();
             services.AddTransient<IToggleStatusUserUseCase, ToggleStatusUserUseCase>();
-            services.AddTransient<IRefreshTokenUseCase, RefreshTokenUseCase>();
 
             return services;
         }

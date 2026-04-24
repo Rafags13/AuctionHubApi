@@ -1,4 +1,4 @@
-﻿using AuctionHub.Domain.Constants.User.Login;
+﻿using AuctionHub.Domain.Constants.Authentication.Login;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;

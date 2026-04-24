@@ -1,5 +1,5 @@
-﻿using AuctionHub.Domain.DTOs.User.Common;
-using AuctionHub.Domain.DTOs.User.Request.Create;
+﻿using AuctionHub.Domain.DTOs.Authentication.Register.Request;
+using AuctionHub.Domain.DTOs.User.Common;
 using AuctionHub.Domain.Enums.User;
 
 namespace AuctionHub.Domain.Entities
@@ -27,7 +27,7 @@ namespace AuctionHub.Domain.Entities
             CreatedAt = createdAt;
         }
 
-        public User(RequestCreateUserDTO content)
+        public User(RequestRegisterUserDTO content)
         {
             Name = content.Name;
             Email = content.Email;
@@ -37,7 +37,7 @@ namespace AuctionHub.Domain.Entities
         }
 
         #region [Factory]
-        public static User Create(RequestCreateUserDTO content, string hashedPassword)
+        public static User Create(RequestRegisterUserDTO content, string hashedPassword)
         {
             var user = new User(content);
             user.SetPassword(hashedPassword);

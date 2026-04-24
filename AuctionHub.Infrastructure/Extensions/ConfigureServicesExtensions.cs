@@ -1,8 +1,8 @@
-﻿using AuctionHub.Domain.Interfaces.Services.User.Login;
-using AuctionHub.Domain.Interfaces.Services.User.Password;
+﻿using AuctionHub.Domain.Interfaces.Services.Authentication.Login;
+using AuctionHub.Domain.Interfaces.Services.Authentication.Password;
 using AuctionHub.Domain.Interfaces.Services.User.Register;
-using AuctionHub.Infrastructure.Services.User.Login;
-using AuctionHub.Infrastructure.Services.User.Password;
+using AuctionHub.Infrastructure.Services.Authentication.Login;
+using AuctionHub.Infrastructure.Services.Authentication.Password;
 using AuctionHub.Infrastructure.Services.User.Register;
 using Microsoft.Extensions.DependencyInjection;
 
