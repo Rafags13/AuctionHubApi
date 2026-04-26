@@ -1,4 +1,5 @@
-﻿using AuctionHub.Domain.Entities;
+﻿using AuctionHub.Domain.Constants.Auction;
+using AuctionHub.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,9 +9,9 @@ namespace AuctionHub.Infrastructure.Context.Configurations
     {
         public void Configure(EntityTypeBuilder<Auction> builder)
         {
-            builder.Property(x => x.Title).HasMaxLength(200);
+            builder.Property(x => x.Title).HasMaxLength(AuctionConstants.TITLE_SIZE);
 
-            builder.Property(x => x.Description).HasMaxLength(1000);
+            builder.Property(x => x.Description).HasMaxLength(AuctionConstants.DESCRIPTION_SIZE);
         }
     }
 }

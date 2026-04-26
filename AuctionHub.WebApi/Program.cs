@@ -29,6 +29,8 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());

@@ -34,6 +34,13 @@ namespace AuctionHub.Infrastructure.Repository
                 .FirstOrDefaultAsync(cancellationToken);
         }
 
+        public Task<ERole?> GetRoleAsync(long id, CancellationToken cancellationToken = default)
+        {
+            return context.Users.Where(u => u.Id == id)
+                .Select(u => (ERole?)u.Role)
+                .FirstOrDefaultAsync(cancellationToken);
+        }
+
         public Task<RequestGenerateTokenDTO?> GetUserByCredentialsAsync(RequestUserLoginDTO content, CancellationToken cancellationToken = default)
         {
             return context.Users.Where(u => u.Email == content.Email && u.PasswordHash == content.Password)
