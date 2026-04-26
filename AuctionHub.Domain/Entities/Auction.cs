@@ -10,7 +10,7 @@ namespace AuctionHub.Domain.Entities
         public string Title { get; init; } = string.Empty;
         public string Description { get; init; } = string.Empty;
         public decimal StartingPrice { get; init; }
-        public decimal? CurrentPrice { get; init; }
+        public decimal? CurrentPrice { get; private set; }
         public DateTime StartTime { get; init; }
         public DateTime EndTime { get; init; }
         public EAuctionStatus Status { get; private set; }
@@ -46,6 +46,11 @@ namespace AuctionHub.Domain.Entities
         public static Auction Create(RequestCreateAuctionDTO content)
         {
             return new Auction(content);
+        }
+
+        public void UpdateCurrentPrice(decimal newPrice)
+        {
+            CurrentPrice = newPrice;
         }
 
         public void End(EndingAuctionResponseDTO content)

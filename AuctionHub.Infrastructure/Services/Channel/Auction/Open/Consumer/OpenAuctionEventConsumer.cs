@@ -1,6 +1,5 @@
 ﻿using AuctionHub.Infrastructure.Context;
 using AuctionHub.Infrastructure.Repository;
-using AuctionHub.Infrastructure.Services.Channel.Auction.Create.Consumer;
 using AuctionHub.Infrastructure.Services.Channel.Auction.Open.Producer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -10,7 +9,7 @@ using System.Threading.Channels;
 namespace AuctionHub.Infrastructure.Services.Channel.Auction.Open.Consumer
 {
     internal sealed class OpenAuctionEventConsumer(
-        ILogger<CreateAuctionEventConsumer> logger,
+        ILogger<OpenAuctionEventConsumer> logger,
         ChannelReader<OpenAuctionEvent> channel,
         IServiceScopeFactory serviceScopeFactory
     ) : BackgroundService

@@ -9,6 +9,8 @@ namespace AuctionHub.Infrastructure.UoW
     internal sealed class UnitOfWork(AuctionHubContext context) : IUnitOfWork
     {
         public IUserRepository UserRepository { get; private set; } = new UserRepository(context);
+        public IAuctionRepository AuctionRepository { get; private set; } = new AuctionRepository(context);
+        public IBidRepository BidRepository { get; private set; } = new BidRepository(context);
 
         public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken ct)
         {

@@ -1,4 +1,5 @@
-﻿using AuctionHub.Application.UseCases.Auction.Create.Commands;
+﻿using AuctionHub.Application.Extensions.UseCases.Auction.Bid;
+using AuctionHub.Application.UseCases.Auction.Create.Commands;
 using AuctionHub.Domain.Interfaces.UseCases.Auction.Create.Commands;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,7 +11,7 @@ namespace AuctionHub.Application.Extensions.UseCases.Auction
         {
             services.AddTransient<ICreateAuctionUseCase, CreateAuctionUseCase>();
 
-            return services;
+            return services.AddBidUseCases();
         }
     }
 }

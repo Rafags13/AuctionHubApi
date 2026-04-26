@@ -1,4 +1,5 @@
 ﻿using AuctionHub.Application.Extensions.UseCases.Auction;
+using AuctionHub.Application.Extensions.UseCases.Auction.Bid;
 using AuctionHub.Application.Extensions.UseCases.Authentication;
 using AuctionHub.Application.Extensions.UseCases.User;
 using Microsoft.Extensions.DependencyInjection;

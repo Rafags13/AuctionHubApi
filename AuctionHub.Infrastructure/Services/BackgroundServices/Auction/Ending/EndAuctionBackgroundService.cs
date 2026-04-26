@@ -9,7 +9,8 @@ namespace AuctionHub.Infrastructure.Services.BackgroundServices.Auction.Ending
 {
     internal sealed class EndAuctionBackgroundService(
         IServiceScopeFactory serviceScopeFactory,
-        IBaseEventProducer<EndAuctionEvent> auctionProducer) : BackgroundService
+        IBaseEventProducer<EndAuctionEvent> auctionProducer
+    ) : BackgroundService
     {
         private static readonly int SECONDS_TO_WAIT = 5;
 
