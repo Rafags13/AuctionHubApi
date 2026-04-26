@@ -1,4 +1,5 @@
 ﻿using AuctionHub.Domain.DTOs.Auction.Create.Request;
+using AuctionHub.Domain.DTOs.Auction.Ending.Response;
 using AuctionHub.Domain.Enums.Auction;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -11,10 +12,10 @@ namespace AuctionHub.Domain.Entities
         public decimal StartingPrice { get; init; }
         public decimal? CurrentPrice { get; init; }
         public DateTime StartTime { get; init; }
-        public DateTime? EndTime { get; init; }
-        public EAuctionStatus Status { get; init; }
+        public DateTime EndTime { get; init; }
+        public EAuctionStatus Status { get; private set; }
         public long SellerId { get; init; }
-        public long? WinnerId { get; init; }
+        public long? WinnerId { get; private set; }
 
         protected Auction() { }
 
@@ -36,10 +37,20 @@ namespace AuctionHub.Domain.Entities
         public User? Winner { get; init; }
         #endregion
 
+        #region [Navigations]
+        public ICollection<Bid> Bids { get; private set; } = [];
+        #endregion
+
         #region [Factory]
         public static Auction Create(RequestCreateAuctionDTO content)
         {
             return new Auction(content);
+        }
+
+        public void End(EndingAuctionResponseDTO content)
+        {
+            Status = EAuctionStatus.CLOSED;
+            WinnerId = content.LastBidderId;
         }
         #endregion
     }

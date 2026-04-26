@@ -1,7 +1,10 @@
 ﻿using AuctionHub.Domain.DTOs.Auction.Create.Request;
+using AuctionHub.Domain.DTOs.Auction.Ending.Response;
 using AuctionHub.Domain.Entities;
+using AuctionHub.Domain.Enums.Auction;
 using AuctionHub.Domain.Interfaces.Repositories;
 using AuctionHub.Infrastructure.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace AuctionHub.Infrastructure.Repository
 {
@@ -14,6 +17,25 @@ namespace AuctionHub.Infrastructure.Repository
             await context.Auctions.AddAsync(auction, cancellationToken);
 
             return await context.SaveChangesAsync(cancellationToken) > 0;
+        }
+
+        public async Task<bool> EndAsync(EndingAuctionResponseDTO content, CancellationToken cancellationToken = default)
+        {
+            var auction = await context.Auctions.FirstOrDefaultAsync(a => a.Id == content.Id, cancellationToken);
+
+            if (auction is null) return false;
+
+            auction.End(content);
+
+            return await context.SaveChangesAsync(cancellationToken) > 0;
+        }
+
+        public Task<EndingAuctionResponseDTO[]> GetExpiredAuctionsAsync(DateTime endedAt, CancellationToken cancellationToken = default)
+        {
+            return context.Auctions
+                .Where(a => a.EndTime <= endedAt && a.Status == EAuctionStatus.OPEN)
+                .Select(a => new EndingAuctionResponseDTO(a.Id, a.Bids.Max(b => (long?)b.Id)))
+                .ToArrayAsync(cancellationToken);
         }
     }
 }
