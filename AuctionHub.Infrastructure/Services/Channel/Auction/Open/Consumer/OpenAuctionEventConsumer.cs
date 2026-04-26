@@ -1,21 +1,21 @@
 ﻿using AuctionHub.Infrastructure.Context;
 using AuctionHub.Infrastructure.Repository;
 using AuctionHub.Infrastructure.Services.Channel.Auction.Create.Consumer;
-using AuctionHub.Infrastructure.Services.Channel.Auction.Ending.Producer;
+using AuctionHub.Infrastructure.Services.Channel.Auction.Open.Producer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Threading.Channels;
 
-namespace AuctionHub.Infrastructure.Services.Channel.Auction.Ending.Consumer
+namespace AuctionHub.Infrastructure.Services.Channel.Auction.Open.Consumer
 {
-    internal sealed class EndingAuctionEventConsumer(
+    internal sealed class OpenAuctionEventConsumer(
         ILogger<CreateAuctionEventConsumer> logger,
-        ChannelReader<EndAuctionEvent> channel,
+        ChannelReader<OpenAuctionEvent> channel,
         IServiceScopeFactory serviceScopeFactory
     ) : BackgroundService
     {
-        protected async override Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             try
             {
@@ -27,18 +27,18 @@ namespace AuctionHub.Infrastructure.Services.Channel.Auction.Ending.Consumer
                 {
                     try
                     {
-                        if(!await repository.EndAsync(@event, stoppingToken))
-                            logger.LogError("Ocorreu um erro ao finalizar o leilão {AuctionId}.", @event.Id);
+                        if (!await repository.OpenAsync(@event, stoppingToken))
+                            logger.LogError("Ocorreu um erro ao abrir o leilão {AuctionId}.", @event.Id);
                     }
                     catch (Exception ex)
                     {
-                        logger.LogError(ex, "Erro ao processar evento no consumidor {ConsumerName}.", nameof(EndingAuctionEventConsumer));
+                        logger.LogError(ex, "Erro ao processar evento no consumidor {ConsumerName}.", nameof(OpenAuctionEventConsumer));
                     }
                 }
             }
             catch (Exception e)
             {
-                logger.LogError(e, "Consumer {ConsumerName} encerrado devido a uma exceção.", nameof(EndingAuctionEventConsumer));
+                logger.LogError(e, "Consumer {ConsumerName} encerrado devido a uma exceção.", nameof(OpenAuctionEventConsumer));
             }
         }
     }

@@ -5,11 +5,14 @@ using AuctionHub.Domain.Interfaces.Services.Channel;
 using AuctionHub.Domain.Interfaces.UoW;
 using AuctionHub.Infrastructure.Context;
 using AuctionHub.Infrastructure.Repository;
-using AuctionHub.Infrastructure.Services.BackgroundServices.Auction;
+using AuctionHub.Infrastructure.Services.BackgroundServices.Auction.Ending;
+using AuctionHub.Infrastructure.Services.BackgroundServices.Auction.Open;
 using AuctionHub.Infrastructure.Services.Channel.Auction.Create.Consumer;
 using AuctionHub.Infrastructure.Services.Channel.Auction.Create.Producer;
 using AuctionHub.Infrastructure.Services.Channel.Auction.Ending.Consumer;
 using AuctionHub.Infrastructure.Services.Channel.Auction.Ending.Producer;
+using AuctionHub.Infrastructure.Services.Channel.Auction.Open.Consumer;
+using AuctionHub.Infrastructure.Services.Channel.Auction.Open.Producer;
 using AuctionHub.Infrastructure.Services.Channel.Producer;
 using AuctionHub.Infrastructure.UoW;
 using Microsoft.EntityFrameworkCore;
@@ -49,11 +52,14 @@ namespace AuctionHub.Infrastructure.Extensions
 
             services.AddChannel<CreateAuctionEvent>();
             services.AddChannel<EndAuctionEvent>();
+            services.AddChannel<OpenAuctionEvent>();
 
             services.AddHostedService<CreateAuctionEventConsumer>();
             services.AddHostedService<EndingAuctionEventConsumer>();
+            services.AddHostedService<OpenAuctionEventConsumer>();
 
             services.AddHostedService<EndAuctionBackgroundService>();
+            services.AddHostedService<OpenAuctionBackgroundService>();
 
             return services;
         }

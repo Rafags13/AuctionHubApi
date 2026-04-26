@@ -25,6 +25,7 @@ namespace AuctionHub.Domain.Entities
             Description = content.Description;
             StartingPrice = content.StartingPrice;
             StartTime = content.StartTime;
+            EndTime = content.EndTime;
             SellerId = content.SellerId;
             Status = EAuctionStatus.SCHEDULED;
         }
@@ -51,6 +52,11 @@ namespace AuctionHub.Domain.Entities
         {
             Status = EAuctionStatus.CLOSED;
             WinnerId = content.LastBidderId;
+        }
+
+        public void Open()
+        {
+            Status = EAuctionStatus.OPEN;
         }
         #endregion
     }

@@ -5,7 +5,7 @@ using AuctionHub.Infrastructure.Services.Channel.Auction.Ending.Producer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace AuctionHub.Infrastructure.Services.BackgroundServices.Auction
+namespace AuctionHub.Infrastructure.Services.BackgroundServices.Auction.Ending
 {
     internal sealed class EndAuctionBackgroundService(
         IServiceScopeFactory serviceScopeFactory,
