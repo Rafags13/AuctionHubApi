@@ -18,5 +18,8 @@ namespace AuctionHub.Domain.Interfaces.Repositories
         Task<bool> UpdateCurrentPriceAsync(RequestUpdateAuctionCurrentPriceDTO content, CancellationToken cancellationToken = default);
         Task<AuctionBidInformationsDTO?> GetAuctionBidInformationsAsync(long id, CancellationToken cancellationToken = default);
         Task<AuctionDetailsResponseDTO?> GetAsync(long id, CancellationToken cancellationToken = default);
+        Task<AuctionNotificationInformationsDTO?> GetOpenAsync(long id, CancellationToken cancellationToken = default);
+        Task<AuctionNotificationInformationsDTO?> GetOutBidAsync(long id, CancellationToken cancellationToken = default);
+        Task<AuctionNotificationInformationsDTO?> GetWinnerAsync(long id, CancellationToken cancellationToken = default);
     }
 }
