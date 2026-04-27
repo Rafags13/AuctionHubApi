@@ -1,6 +1,7 @@
 ﻿using AuctionHub.Domain.DTOs.Auction.Bid.Request;
 using AuctionHub.Domain.DTOs.Auction.Bid.Response;
 using AuctionHub.Domain.Entities;
+using AuctionHub.Domain.Enums.Auction;
 using AuctionHub.Domain.Interfaces.Repositories;
 using AuctionHub.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
@@ -9,34 +10,49 @@ namespace AuctionHub.Infrastructure.Repository
 {
     internal sealed class BidRepository(AuctionHubContext context) : BaseRepository<Bid>(context), IBidRepository
     {
-        public async Task<bool> CreateAndOutBidAsync(BidRequestDTO content, CancellationToken cancellationToken = default)
+        public async Task<bool> CancelAsync(long id, CancellationToken cancellationToken = default)
         {
-            if (!await CreateAsync(content, cancellationToken)) return false;
+            var bid = await FirstOrDefaultAsync(b => b.Id == id, cancellationToken);
 
-            if (content.OutBidId.HasValue && !await OutbidAsync(content.OutBidId.Value, cancellationToken)) return false;
+            if (bid is null) return false;
 
-            return true;
+            bid.Cancel();
+
+            return await context.SaveChangesAsync(cancellationToken) > 0;
         }
 
-        public Task<BidInformationsResponseDTO?> GetBidToOutBidAsync(long auctionId, CancellationToken cancellationToken = default)
-        {
-            return context.Bids
-                .Where(b => b.AuctionId == auctionId)
-                .OrderByDescending(b => b.Id)
-                .Select(b => new BidInformationsResponseDTO(b.Id, b.Amount))
-                .FirstOrDefaultAsync(cancellationToken);
-        }
-
-        private async Task<bool> CreateAsync(BidRequestDTO content, CancellationToken cancellationToken = default)
+        public async Task<long?> CreateAsync(BidRequestDTO content, CancellationToken cancellationToken = default)
         {
             var bid = Bid.Create(content);
 
             await context.Bids.AddAsync(bid, cancellationToken);
 
-            return await context.SaveChangesAsync(cancellationToken) > 0;
+            await context.SaveChangesAsync(cancellationToken);
+
+            return bid?.Id;
         }
 
-        private async Task<bool> OutbidAsync(long outBidId, CancellationToken cancellationToken = default)
+        private IQueryable<Bid> GetLastBid(long auctionId)
+        {
+            return GetAll(b => b.AuctionId == auctionId && b.Status == EBidStatus.VALID)
+                .OrderByDescending(b => b.Id);
+        }
+
+        public Task<decimal?> GetLastBidAmountAsync(long auctionId, CancellationToken cancellationToken = default)
+        {
+            return GetLastBid(auctionId)
+                .Select(b => (decimal?)b.Amount)
+                .FirstOrDefaultAsync(cancellationToken);
+        }
+
+        public Task<long?> GetOutBidIdAsync(long auctionId, CancellationToken cancellationToken = default)
+        {
+            return GetLastBid(auctionId)
+                .Select(b => (long?)b.Id)
+                .FirstOrDefaultAsync(cancellationToken);
+        }
+
+        public async Task<bool> OutbidAsync(long outBidId, CancellationToken cancellationToken = default)
         {
             var bidToOutBid = await context.Bids.FirstOrDefaultAsync(b => b.Id == outBidId, cancellationToken);
 
