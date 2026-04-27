@@ -1,8 +1,6 @@
 ﻿using AuctionHub.Domain.DTOs.Notification.Create;
 using AuctionHub.Domain.Interfaces.Repositories;
 using AuctionHub.Domain.Interfaces.Services.Channel;
-using AuctionHub.Infrastructure.Context;
-using AuctionHub.Infrastructure.Repository;
 using AuctionHub.Infrastructure.Services.Channel.Auction.Ending.Producer;
 using AuctionHub.Infrastructure.Services.Channel.Notification.Create.Producer;
 using Microsoft.Extensions.DependencyInjection;
