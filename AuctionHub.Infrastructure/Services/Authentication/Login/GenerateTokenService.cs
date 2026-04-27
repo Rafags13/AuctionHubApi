@@ -31,8 +31,8 @@ namespace AuctionHub.Infrastructure.Services.Authentication.Login
 
             var claims = new[]
             {
-                new Claim("id", content.Id.ToString()),
-                new Claim("name", content.Name),
+                new Claim(ClaimTypes.NameIdentifier, content.Id.ToString()),
+                new Claim(ClaimTypes.Name, content.Name),
                 new Claim(ClaimTypes.Role, content.Role.ToString())
             };
 

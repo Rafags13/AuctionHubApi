@@ -22,6 +22,95 @@ namespace AuctionHub.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("AuctionHub.Domain.Entities.Auction", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal?>("CurrentPrice")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("SellerId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("StartingPrice")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("WinnerId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SellerId");
+
+                    b.HasIndex("WinnerId");
+
+                    b.ToTable("Auctions");
+                });
+
+            modelBuilder.Entity("AuctionHub.Domain.Entities.Bid", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("numeric");
+
+                    b.Property<long>("AuctionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("BidderId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuctionId");
+
+                    b.HasIndex("BidderId");
+
+                    b.ToTable("Bids");
+                });
+
             modelBuilder.Entity("AuctionHub.Domain.Entities.User", b =>
                 {
                     b.Property<long>("Id")
@@ -78,6 +167,47 @@ namespace AuctionHub.Infrastructure.Migrations
                             Role = 1,
                             Status = 1
                         });
+                });
+
+            modelBuilder.Entity("AuctionHub.Domain.Entities.Auction", b =>
+                {
+                    b.HasOne("AuctionHub.Domain.Entities.User", "Seller")
+                        .WithMany()
+                        .HasForeignKey("SellerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AuctionHub.Domain.Entities.User", "Winner")
+                        .WithMany()
+                        .HasForeignKey("WinnerId");
+
+                    b.Navigation("Seller");
+
+                    b.Navigation("Winner");
+                });
+
+            modelBuilder.Entity("AuctionHub.Domain.Entities.Bid", b =>
+                {
+                    b.HasOne("AuctionHub.Domain.Entities.Auction", "Auction")
+                        .WithMany("Bids")
+                        .HasForeignKey("AuctionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AuctionHub.Domain.Entities.User", "Bidder")
+                        .WithMany()
+                        .HasForeignKey("BidderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Auction");
+
+                    b.Navigation("Bidder");
+                });
+
+            modelBuilder.Entity("AuctionHub.Domain.Entities.Auction", b =>
+                {
+                    b.Navigation("Bids");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,14 +1,27 @@
 ﻿using AuctionHub.Domain.Constants.Authentication.Login;
 using AuctionHub.Domain.Constants.Authentication.Password;
 using AuctionHub.Domain.Interfaces.Repositories;
+using AuctionHub.Domain.Interfaces.Services.Channel;
 using AuctionHub.Domain.Interfaces.UoW;
 using AuctionHub.Infrastructure.Context;
 using AuctionHub.Infrastructure.Repository;
+using AuctionHub.Infrastructure.Services.BackgroundServices.Auction.Ending;
+using AuctionHub.Infrastructure.Services.BackgroundServices.Auction.Open;
+using AuctionHub.Infrastructure.Services.Channel.Auction.Bid.Consumer;
+using AuctionHub.Infrastructure.Services.Channel.Auction.Bid.Producer;
+using AuctionHub.Infrastructure.Services.Channel.Auction.Create.Consumer;
+using AuctionHub.Infrastructure.Services.Channel.Auction.Create.Producer;
+using AuctionHub.Infrastructure.Services.Channel.Auction.Ending.Consumer;
+using AuctionHub.Infrastructure.Services.Channel.Auction.Ending.Producer;
+using AuctionHub.Infrastructure.Services.Channel.Auction.Open.Consumer;
+using AuctionHub.Infrastructure.Services.Channel.Auction.Open.Producer;
+using AuctionHub.Infrastructure.Services.Channel.Producer;
 using AuctionHub.Infrastructure.UoW;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Threading.Channels;
 
 namespace AuctionHub.Infrastructure.Extensions
 {
@@ -16,11 +29,28 @@ namespace AuctionHub.Infrastructure.Extensions
     {
         public static IServiceCollection ConfigureInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
-            return services.ConfigureRepository(configuration)
+            return services
+                .ConfigureContextDatabase(configuration)
+                .ConfigureRepository()
+                .ConfigureBackgrounServices()
                 .ConfigureContants(configuration);
         }
 
-        private static IServiceCollection ConfigureRepository(this IServiceCollection services, IConfiguration configuration)
+        private static IServiceCollection ConfigureRepository(this IServiceCollection services)
+        {
+            services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IAuctionRepository, AuctionRepository>();
+            services.AddScoped<IBidRepository, BidRepository>();
+
+            services.AddTransient(typeof(IBaseEventProducer<>), typeof(BaseEventProducer<>));
+
+            return services;
+        }
+
+        private static IServiceCollection ConfigureContextDatabase(this IServiceCollection services, IConfiguration configuration)
         {
             string connectionString = Environment.GetEnvironmentVariable("CONTEXT_DATA_SOURCE")
                                        ?? configuration.GetConnectionString("CONTEXT_DATA_SOURCE")
@@ -34,8 +64,39 @@ namespace AuctionHub.Infrastructure.Extensions
                 options.EnableDetailedErrors();
             });
 
-            services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            return services;
+        }
+
+        private static IServiceCollection ConfigureBackgrounServices(this IServiceCollection services)
+        {
+            services.AddChannel<CreateAuctionEvent>();
+            services.AddChannel<EndAuctionEvent>();
+            services.AddChannel<OpenAuctionEvent>();
+            services.AddChannel<BidAuctionEvent>();
+
+            services.AddHostedService<CreateAuctionEventConsumer>();
+            services.AddHostedService<EndingAuctionEventConsumer>();
+            services.AddHostedService<OpenAuctionEventConsumer>();
+            services.AddHostedService<BidAuctionEventConsumer>();
+
+            services.AddHostedService<EndAuctionBackgroundService>();
+            services.AddHostedService<OpenAuctionBackgroundService>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddChannel<T>(this IServiceCollection services)
+            where T : class
+        {
+            var channel = Channel.CreateUnbounded<T>(new UnboundedChannelOptions
+            {
+                SingleReader = true,
+                SingleWriter = false
+            });
+
+            services.AddSingleton(channel);
+            services.AddSingleton(channel.Writer);
+            services.AddSingleton(channel.Reader);
 
             return services;
         }

@@ -1,4 +1,6 @@
-﻿using AuctionHub.WebApi.Endpoints.Authentication;
+﻿using AuctionHub.WebApi.Endpoints.Auction;
+using AuctionHub.WebApi.Endpoints.Auction.Bid;
+using AuctionHub.WebApi.Endpoints.Authentication;
 using AuctionHub.WebApi.Endpoints.User;
 
 namespace AuctionHub.WebApi.Extensions
@@ -9,7 +11,9 @@ namespace AuctionHub.WebApi.Extensions
         {
             return endpoint
                 .MapAuthenticationEndpoints()
-                .AddUserEndpoints();
+                .AddUserEndpoints()
+                .AddAuctionEndpoints()
+                .AddBidEndpoints();
         }
     }
 }
