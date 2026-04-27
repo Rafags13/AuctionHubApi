@@ -8,6 +8,7 @@ namespace AuctionHub.Infrastructure.Context
         public DbSet<User> Users { get; set; }
         public DbSet<Auction> Auctions { get; set; }
         public DbSet<Bid> Bids { get; set; }
+        public DbSet<Payment> Payments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

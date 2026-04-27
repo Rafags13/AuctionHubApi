@@ -8,6 +8,7 @@ namespace AuctionHub.Domain.Interfaces.UoW
         IUserRepository UserRepository { get; }
         IAuctionRepository AuctionRepository { get; }
         IBidRepository BidRepository { get; }
+        IPaymentRepository PaymentRepository { get; }
         Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken ct);
         Task<int> CommitAsync(CancellationToken ct);
     }
