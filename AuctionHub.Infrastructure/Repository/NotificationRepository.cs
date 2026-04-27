@@ -32,9 +32,11 @@ namespace AuctionHub.Infrastructure.Repository
 
         public async Task<PaginatedDTO<PaginatedNotificationResponseDTO>> GetPaginatedAsync(PaginatedNotificationRequestDTO content, CancellationToken cancellationToken = default)
         {
-            var totalItems = await CountAsync(cancellationToken);
+            var query = GetAll(n => n.UserId == content.UserId);
 
-            var items = await GetAll(n => n.UserId == content.UserId)
+            var totalItems = await query.CountAsync(cancellationToken);
+
+            var items = await query
                 .Paginate(content.Page, content.PageSize)
                 .OrderBy(n => n.Id)
                 .Select(n => new PaginatedNotificationResponseDTO(n.Id, n.Type, n.ReadAt))

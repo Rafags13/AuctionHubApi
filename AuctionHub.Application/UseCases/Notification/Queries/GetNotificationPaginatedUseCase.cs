@@ -19,6 +19,8 @@ namespace AuctionHub.Application.UseCases.Notification.Queries
 
             if (!userId.HasValue) return Task.FromResult(new PaginatedDTO<PaginatedNotificationResponseDTO>([], 0, 0, 0));
 
+            content.SetUserId(userId.Value);
+
             return unitOfWork.NotificationRepository.GetPaginatedAsync(content, cancellationToken);
         }
     }

@@ -28,7 +28,7 @@ namespace AuctionHub.Application.UseCases.Notification.Queries
                 return new NotificationNotFoundError();
 
             if (notification.ReadAt is null)
-                await unitOfWork.NotificationRepository.ReadAsync(new ReadNotificationRequestDTO(notification.Id, DateTime.UtcNow), cancellationToken);
+                await unitOfWork.NotificationRepository.ReadAsync(new ReadNotificationRequestDTO(id, DateTime.UtcNow), cancellationToken);
 
             return notification;
         }
