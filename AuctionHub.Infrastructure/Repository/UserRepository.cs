@@ -1,4 +1,5 @@
-﻿using AuctionHub.Domain.DTOs.Authentication.RefreshToken.Response;
+﻿using AuctionHub.Domain.Constants.Caching;
+using AuctionHub.Domain.DTOs.Authentication.RefreshToken.Response;
 using AuctionHub.Domain.DTOs.Authentication.Register.Request;
 using AuctionHub.Domain.DTOs.User.Common;
 using AuctionHub.Domain.DTOs.User.Profile.Response;
@@ -63,7 +64,8 @@ namespace AuctionHub.Infrastructure.Repository
                 .Select(u => new UserProfileDTO(u.Name, u.Email, u.Role, u.Status))
                 .FirstOrDefaultAsync(cancellationToken);
 
-            cachingService.Set(cacheKey, user, TimeSpan.FromMinutes(5));
+            if(user != null)
+                cachingService.Set(cacheKey, user, CachingConstants.DEFAULT_EXPIRATION_CACHING);
 
             return user;
         }

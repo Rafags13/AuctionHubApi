@@ -1,4 +1,5 @@
-﻿using AuctionHub.Domain.DTOs.Auction.Bid.Response;
+﻿using AuctionHub.Domain.Constants.Caching;
+using AuctionHub.Domain.DTOs.Auction.Bid.Response;
 using AuctionHub.Domain.DTOs.Auction.Create.Request;
 using AuctionHub.Domain.DTOs.Auction.Details.Response;
 using AuctionHub.Domain.DTOs.Auction.Ending.Response;
@@ -102,9 +103,8 @@ namespace AuctionHub.Infrastructure.Repository
                 ))
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (auction is null) return auction;
-
-            cachingService.Set(cacheKey, auction, TimeSpan.FromMinutes(5));
+            if(auction != null)
+                cachingService.Set(cacheKey, auction, CachingConstants.DEFAULT_EXPIRATION_CACHING);
 
             return auction;
         }
