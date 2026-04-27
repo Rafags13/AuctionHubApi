@@ -1,4 +1,5 @@
 ﻿using AuctionHub.Domain.DTOs.Auction.UpdatePrice;
+using AuctionHub.Domain.Interfaces.Repositories;
 using AuctionHub.Infrastructure.Context;
 using AuctionHub.Infrastructure.Repository;
 using AuctionHub.Infrastructure.Services.Channel.Auction.Bid.Producer;
@@ -21,8 +22,8 @@ namespace AuctionHub.Infrastructure.Services.Channel.Auction.Bid.Consumer
             {
                 var scope = serviceScopeFactory.CreateScope();
                 var context = scope.ServiceProvider.GetRequiredService<AuctionHubContext>();
-                var bidRepository = new BidRepository(context);
-                var auctionRepository = new AuctionRepository(context);
+                var bidRepository = scope.ServiceProvider.GetRequiredService<IBidRepository>();
+                var auctionRepository = scope.ServiceProvider.GetRequiredService<IAuctionRepository>();
 
                 await foreach (var @event in channel.ReadAllAsync(stoppingToken))
                 {

@@ -1,4 +1,5 @@
-﻿using AuctionHub.Domain.Interfaces.Services.Channel;
+﻿using AuctionHub.Domain.Interfaces.Repositories;
+using AuctionHub.Domain.Interfaces.Services.Channel;
 using AuctionHub.Infrastructure.Context;
 using AuctionHub.Infrastructure.Repository;
 using AuctionHub.Infrastructure.Services.Channel.Auction.Ending.Producer;
@@ -17,8 +18,7 @@ namespace AuctionHub.Infrastructure.Services.BackgroundServices.Auction.Ending
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             var scope = serviceScopeFactory.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<AuctionHubContext>();
-            var repository = new AuctionRepository(context);
+            var repository = scope.ServiceProvider.GetRequiredService<IAuctionRepository>();
 
             while(!stoppingToken.IsCancellationRequested)
             {

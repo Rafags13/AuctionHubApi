@@ -1,6 +1,7 @@
 ﻿using AuctionHub.Domain.DTOs.Authentication.RefreshToken.Response;
 using AuctionHub.Domain.DTOs.Authentication.Register.Request;
 using AuctionHub.Domain.DTOs.User.Common;
+using AuctionHub.Domain.DTOs.User.Profile.Response;
 using AuctionHub.Domain.DTOs.User.Request.Login;
 using AuctionHub.Domain.DTOs.User.Toggle.Request;
 using AuctionHub.Domain.Entities;
@@ -17,5 +18,6 @@ namespace AuctionHub.Domain.Interfaces.Repositories
         Task<RequestGenerateTokenDTO?> GetUserByCredentialsAsync(RequestUserLoginDTO content, CancellationToken cancellationToken = default);
         Task<int> ToggleAsync(RequestToggleUserStatusDTO content, CancellationToken cancellationToken = default);
         Task<ERole?> GetRoleAsync(long id, CancellationToken cancellationToken = default);
+        Task<UserProfileDTO?> GetUserProfileAsync(long id, CancellationToken cancellationToken = default);
     }
 }

@@ -1,8 +1,10 @@
 ﻿using AuctionHub.Domain.Interfaces.Services.Authentication.Login;
 using AuctionHub.Domain.Interfaces.Services.Authentication.Password;
+using AuctionHub.Domain.Interfaces.Services.Caching;
 using AuctionHub.Domain.Interfaces.Services.User.Register;
 using AuctionHub.Infrastructure.Services.Authentication.Login;
 using AuctionHub.Infrastructure.Services.Authentication.Password;
+using AuctionHub.Infrastructure.Services.Caching;
 using AuctionHub.Infrastructure.Services.User.Register;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,6 +18,8 @@ namespace AuctionHub.Infrastructure.Extensions
             services.AddScoped<IValidateRegisterService, ValidateRegisterService>();
 
             services.AddScoped<IGenerateTokenService, GenerateTokenService>();
+
+            services.AddScoped<ICachingService, CachingService>();
 
             return services;
         }

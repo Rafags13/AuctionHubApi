@@ -1,17 +1,19 @@
 ﻿using AuctionHub.Domain.DTOs.Auction.Bid.Response;
 using AuctionHub.Domain.DTOs.Auction.Create.Request;
+using AuctionHub.Domain.DTOs.Auction.Details.Response;
 using AuctionHub.Domain.DTOs.Auction.Ending.Response;
 using AuctionHub.Domain.DTOs.Auction.Open.Response;
 using AuctionHub.Domain.DTOs.Auction.UpdatePrice;
 using AuctionHub.Domain.Entities;
 using AuctionHub.Domain.Enums.Auction;
 using AuctionHub.Domain.Interfaces.Repositories;
+using AuctionHub.Domain.Interfaces.Services.Caching;
 using AuctionHub.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
 namespace AuctionHub.Infrastructure.Repository
 {
-    internal sealed class AuctionRepository(AuctionHubContext context) : BaseRepository<Auction>(context), IAuctionRepository
+    internal sealed class AuctionRepository(AuctionHubContext context, ICachingService cachingService) : BaseRepository<Auction>(context), IAuctionRepository
     {
         public async Task<bool> CreateAsync(RequestCreateAuctionDTO content, CancellationToken cancellationToken = default)
         {
@@ -76,6 +78,35 @@ namespace AuctionHub.Infrastructure.Repository
             auction.UpdateCurrentPrice(content.NewPrice);
 
             return await context.SaveChangesAsync(cancellationToken) > 0;
+        }
+
+        public async Task<AuctionDetailsResponseDTO?> GetAsync(long id, CancellationToken cancellationToken = default)
+        {
+            var cacheKey = $"Auction_{id}";
+            var cachedAuction = cachingService.Get<AuctionDetailsResponseDTO>(cacheKey);
+            if (cachedAuction != null)
+                return cachedAuction;
+
+            var auction = await GetAll(a => a.Id == id)
+                .Select(a => new AuctionDetailsResponseDTO(
+                    a.Id,
+                    a.Title,
+                    a.Description,
+                    a.StartingPrice,
+                    a.CurrentPrice,
+                    a.StartTime,
+                    a.EndTime,
+                    a.Status,
+                    a.Seller.Name,
+                    a.Winner != null ? a.Winner.Name : null
+                ))
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (auction is null) return auction;
+
+            cachingService.Set(cacheKey, auction, TimeSpan.FromMinutes(5));
+
+            return auction;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using AuctionHub.Infrastructure.Context;
+﻿using AuctionHub.Domain.Interfaces.Repositories;
+using AuctionHub.Infrastructure.Context;
 using AuctionHub.Infrastructure.Repository;
 using AuctionHub.Infrastructure.Services.Channel.Auction.Open.Producer;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,8 +20,7 @@ namespace AuctionHub.Infrastructure.Services.Channel.Auction.Open.Consumer
             try
             {
                 var scope = serviceScopeFactory.CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<AuctionHubContext>();
-                var repository = new AuctionRepository(context);
+                var repository = scope.ServiceProvider.GetRequiredService<IAuctionRepository>();
 
                 await foreach (var @event in channel.ReadAllAsync(stoppingToken))
                 {

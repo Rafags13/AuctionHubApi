@@ -1,6 +1,8 @@
 ﻿using AuctionHub.Domain.DTOs.Auction.Bid.Request;
+using AuctionHub.Domain.Enums.User;
 using AuctionHub.Domain.Errors.Common.Base;
 using AuctionHub.Domain.Interfaces.UseCases.Auction.Bid.Commands;
+using AuctionHub.WebApi.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuctionHub.WebApi.Endpoints.Auction.Bid
@@ -28,7 +30,8 @@ namespace AuctionHub.WebApi.Endpoints.Auction.Bid
                 .Produces(StatusCodes.Status201Created)
                 .Produces<BaseError>(StatusCodes.Status400BadRequest)
                 .Produces<BaseError>(StatusCodes.Status403Forbidden)
-                .Produces<BaseError>(StatusCodes.Status404NotFound);
+                .Produces<BaseError>(StatusCodes.Status404NotFound)
+                .Authorize(ERole.BIDDER);
 
             return endpoints;
         }

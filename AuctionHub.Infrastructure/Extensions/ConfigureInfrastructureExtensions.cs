@@ -29,11 +29,28 @@ namespace AuctionHub.Infrastructure.Extensions
     {
         public static IServiceCollection ConfigureInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
-            return services.ConfigureRepository(configuration)
+            return services
+                .ConfigureContextDatabase(configuration)
+                .ConfigureRepository()
+                .ConfigureBackgrounServices()
                 .ConfigureContants(configuration);
         }
 
-        private static IServiceCollection ConfigureRepository(this IServiceCollection services, IConfiguration configuration)
+        private static IServiceCollection ConfigureRepository(this IServiceCollection services)
+        {
+            services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IAuctionRepository, AuctionRepository>();
+            services.AddScoped<IBidRepository, BidRepository>();
+
+            services.AddTransient(typeof(IBaseEventProducer<>), typeof(BaseEventProducer<>));
+
+            return services;
+        }
+
+        private static IServiceCollection ConfigureContextDatabase(this IServiceCollection services, IConfiguration configuration)
         {
             string connectionString = Environment.GetEnvironmentVariable("CONTEXT_DATA_SOURCE")
                                        ?? configuration.GetConnectionString("CONTEXT_DATA_SOURCE")
@@ -47,11 +64,11 @@ namespace AuctionHub.Infrastructure.Extensions
                 options.EnableDetailedErrors();
             });
 
-            services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            return services;
+        }
 
-            services.AddTransient(typeof(IBaseEventProducer<>), typeof(BaseEventProducer<>));
-
+        private static IServiceCollection ConfigureBackgrounServices(this IServiceCollection services)
+        {
             services.AddChannel<CreateAuctionEvent>();
             services.AddChannel<EndAuctionEvent>();
             services.AddChannel<OpenAuctionEvent>();
