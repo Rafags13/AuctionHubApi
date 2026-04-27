@@ -18,7 +18,7 @@ namespace AuctionHub.Domain.Entities
             Amount = content.Amount;
             AuctionId = content.AuctionId;
             BidderId = content.BidderId;
-            Status = EBidStatus.VALID;
+            Status = EBidStatus.PENDING_PAYMENT;
         }
 
         #region [Foreign Key]
@@ -38,6 +38,11 @@ namespace AuctionHub.Domain.Entities
         public void Outbid()
         {
             Status = EBidStatus.OUTBID;
+        }
+
+        public void Cancel()
+        {
+            Status = EBidStatus.CANCELLED;
         }
         #endregion
     }

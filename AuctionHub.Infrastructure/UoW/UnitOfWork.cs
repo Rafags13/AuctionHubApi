@@ -5,11 +5,18 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace AuctionHub.Infrastructure.UoW
 {
-    internal sealed class UnitOfWork(IUserRepository userRepository, IAuctionRepository auctionRepository, IBidRepository bidRepository, AuctionHubContext context) : IUnitOfWork
+    internal sealed class UnitOfWork(
+        IUserRepository userRepository,
+        IAuctionRepository auctionRepository,
+        IBidRepository bidRepository,
+        IPaymentRepository paymentRepository,
+        AuctionHubContext context
+        ) : IUnitOfWork
     {
         public IUserRepository UserRepository { get; private set; } = userRepository;
         public IAuctionRepository AuctionRepository { get; private set; } = auctionRepository;
         public IBidRepository BidRepository { get; private set; } = bidRepository;
+        public IPaymentRepository PaymentRepository { get; private set; } = paymentRepository;
 
         public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken ct)
         {

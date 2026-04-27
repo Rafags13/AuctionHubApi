@@ -10,8 +10,7 @@ using AuctionHub.Domain.Helpers.Autentication;
 using AuctionHub.Domain.Interfaces.Services.Channel;
 using AuctionHub.Domain.Interfaces.UoW;
 using AuctionHub.Domain.Interfaces.UseCases.Auction.Bid.Commands;
-using AuctionHub.Infrastructure.Extensions;
-using AuctionHub.Infrastructure.Services.Channel.Auction.Bid.Producer;
+using AuctionHub.Infrastructure.Services.Channel.Auction.Bid.Place.Producer;
 using Microsoft.AspNetCore.Http;
 using OneOf;
 
@@ -26,21 +25,18 @@ namespace AuctionHub.Application.UseCases.Auction.Bid.Create.Commands
         public async Task<OneOf<bool, BaseError>> BidAsync(BidRequestDTO content, CancellationToken cancellationToken = default)
         {
             var currentUserId = SessionHelper.GetUserId(httpContextAccessor.HttpContext);
-            var response = await ValidateAsync(content, currentUserId, cancellationToken);
-            if (response.IsError())
-                return response.GetError();
-
-            var outBidId = response.GetValue();
+            var error = await ValidateAsync(content, currentUserId, cancellationToken);
+            if (error != null)
+                return error;
 
             content.SetBidderId(currentUserId!.Value);
-            content.SetOutBidId(outBidId);
 
             await bidProducer.DispatchAsync(new BidAuctionEvent(content), cancellationToken);
 
             return true;
         }
 
-        private async Task<OneOf<long?, BaseError>> ValidateAsync(BidRequestDTO content, long? userId, CancellationToken cancellationToken)
+        private async Task<BaseError?> ValidateAsync(BidRequestDTO content, long? userId, CancellationToken cancellationToken)
         {
             var userError = await ValidateCurrentUserAsync(userId, cancellationToken);
             if (userError != null)
@@ -54,15 +50,15 @@ namespace AuctionHub.Application.UseCases.Auction.Bid.Create.Commands
             if (currentAuctionInfo.Status != EAuctionStatus.OPEN)
                 return new AuctionNotOpenedError();
 
-            var lastBidInfo = await unitOfWork.BidRepository.GetBidToOutBidAsync(content.AuctionId, cancellationToken);
+            var lastBidAmount = await unitOfWork.BidRepository.GetLastBidAmountAsync(content.AuctionId, cancellationToken);
 
-            if (lastBidInfo == null && currentAuctionInfo.StartingPrice > content.Amount)
+            if (lastBidAmount == null && currentAuctionInfo.StartingPrice > content.Amount)
                 return new BidBelowStartingPriceError();
 
-            if (lastBidInfo?.Amount >= content.Amount)
+            if (lastBidAmount >= content.Amount)
                 return new AmountShouldBeHigherThenLastBidError();
 
-            return lastBidInfo?.Id;
+            return null;
         }
 
         private async Task<BaseError?> ValidateCurrentUserAsync(long? userId, CancellationToken cancellationToken)

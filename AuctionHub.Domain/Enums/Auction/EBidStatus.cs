@@ -5,5 +5,6 @@
         VALID = 1,
         OUTBID,
         CANCELLED,
+        PENDING_PAYMENT,
     }
 }
