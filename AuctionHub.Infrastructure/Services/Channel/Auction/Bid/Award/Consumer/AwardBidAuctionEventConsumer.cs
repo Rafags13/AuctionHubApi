@@ -1,8 +1,11 @@
 ﻿using AuctionHub.Domain.DTOs.Auction.UpdatePrice;
+using AuctionHub.Domain.DTOs.Notification.Create;
 using AuctionHub.Domain.Interfaces.Repositories;
+using AuctionHub.Domain.Interfaces.Services.Channel;
 using AuctionHub.Infrastructure.Context;
 using AuctionHub.Infrastructure.Services.Channel.Auction.Bid.Award.Producer;
 using AuctionHub.Infrastructure.Services.Channel.Auction.Bid.Place.Consumer;
+using AuctionHub.Infrastructure.Services.Channel.Notification.Create.Producer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -24,6 +27,8 @@ namespace AuctionHub.Infrastructure.Services.Channel.Auction.Bid.Award.Consumer
                 var context = scope.ServiceProvider.GetRequiredService<AuctionHubContext>();
                 var auctionRepository = scope.ServiceProvider.GetRequiredService<IAuctionRepository>();
                 var bidRepository = scope.ServiceProvider.GetRequiredService<IBidRepository>();
+                var notificationChannel = scope.ServiceProvider.GetRequiredService<IBaseEventProducer<CreateNotificationEvent>>();
+
                 await foreach (var @event in channel.ReadAllAsync(stoppingToken))
                 {
                     try
@@ -32,10 +37,9 @@ namespace AuctionHub.Infrastructure.Services.Channel.Auction.Bid.Award.Consumer
 
                         var outBidId = await bidRepository.GetOutBidIdAsync(@event.AuctionId, stoppingToken);
 
-                        if (
-                            !outBidId.HasValue ||
-                            !await bidRepository.OutbidAsync(outBidId.Value, stoppingToken) ||
-                           !await auctionRepository.UpdateCurrentPriceAsync(
+                        if ((outBidId.HasValue &&
+                             !await bidRepository.OutbidAsync(outBidId.Value, stoppingToken)) ||
+                            !await auctionRepository.UpdateCurrentPriceAsync(
                                new RequestUpdateAuctionCurrentPriceDTO(@event.AuctionId, @event.Amount), stoppingToken
                         ))
                         {
@@ -43,6 +47,16 @@ namespace AuctionHub.Infrastructure.Services.Channel.Auction.Bid.Award.Consumer
                         }
 
                         await transaction.CommitAsync(stoppingToken);
+
+                        if (outBidId.HasValue)
+                        {
+                            var auctionOutBidInformations = await auctionRepository.GetOutBidAsync(@event.AuctionId, stoppingToken);
+                            if (auctionOutBidInformations != null)
+                            {
+                                var outbidNotification = new CreateOutBidNotificationRequestDTO(auctionOutBidInformations.Title, auctionOutBidInformations.UserId);
+                                await notificationChannel.DispatchAsync(new CreateNotificationEvent(outbidNotification), stoppingToken);
+                            }
+                        }
                     }
                     catch (Exception ex)
                     {

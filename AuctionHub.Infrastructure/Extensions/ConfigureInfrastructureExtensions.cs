@@ -19,6 +19,8 @@ using AuctionHub.Infrastructure.Services.Channel.Auction.Ending.Consumer;
 using AuctionHub.Infrastructure.Services.Channel.Auction.Ending.Producer;
 using AuctionHub.Infrastructure.Services.Channel.Auction.Open.Consumer;
 using AuctionHub.Infrastructure.Services.Channel.Auction.Open.Producer;
+using AuctionHub.Infrastructure.Services.Channel.Notification.Create.Consumer;
+using AuctionHub.Infrastructure.Services.Channel.Notification.Create.Producer;
 using AuctionHub.Infrastructure.Services.Channel.Payment.Process.Consumer;
 using AuctionHub.Infrastructure.Services.Channel.Payment.Process.Producer;
 using AuctionHub.Infrastructure.Services.Channel.Producer;
@@ -26,6 +28,7 @@ using AuctionHub.Infrastructure.UoW;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Threading.Channels;
 
@@ -51,6 +54,7 @@ namespace AuctionHub.Infrastructure.Extensions
             services.AddScoped<IAuctionRepository, AuctionRepository>();
             services.AddScoped<IBidRepository, BidRepository>();
             services.AddScoped<IPaymentRepository, PaymentRepository>();
+            services.AddScoped<INotificationRepository, NotificationRepository>();
 
             services.AddTransient(typeof(IBaseEventProducer<>), typeof(BaseEventProducer<>));
 
@@ -76,21 +80,14 @@ namespace AuctionHub.Infrastructure.Extensions
 
         private static IServiceCollection ConfigureBackgrounServices(this IServiceCollection services)
         {
-            services.AddChannel<CreateAuctionEvent>();
-            services.AddChannel<EndAuctionEvent>();
-            services.AddChannel<OpenAuctionEvent>();
-            services.AddChannel<BidAuctionEvent>();
-            services.AddChannel<ProcessPaymentEvent>();
-            services.AddChannel<AwardBidAuctionEvent>();
-            services.AddChannel<CancelBidAuctionEvent>();
-
-            services.AddHostedService<CreateAuctionEventConsumer>();
-            services.AddHostedService<EndingAuctionEventConsumer>();
-            services.AddHostedService<OpenAuctionEventConsumer>();
-            services.AddHostedService<BidAuctionEventConsumer>();
-            services.AddHostedService<ProcessPaymentEventConsumer>();
-            services.AddHostedService<AwardBidAuctionEventConsumer>();
-            services.AddHostedService<CancelBidAuctionEventConsumer>();
+            services.AddChannelService<CreateAuctionEvent, CreateAuctionEventConsumer>();
+            services.AddChannelService<EndAuctionEvent, EndingAuctionEventConsumer>();
+            services.AddChannelService<OpenAuctionEvent, OpenAuctionEventConsumer>();
+            services.AddChannelService<BidAuctionEvent, BidAuctionEventConsumer>();
+            services.AddChannelService<ProcessPaymentEvent, ProcessPaymentEventConsumer>();
+            services.AddChannelService<AwardBidAuctionEvent, AwardBidAuctionEventConsumer>();
+            services.AddChannelService<CancelBidAuctionEvent, CancelBidAuctionEventConsumer>();
+            services.AddChannelService<CreateNotificationEvent, CreateNotificationEventConsumer>();
 
             services.AddHostedService<EndAuctionBackgroundService>();
             services.AddHostedService<OpenAuctionBackgroundService>();
@@ -98,7 +95,17 @@ namespace AuctionHub.Infrastructure.Extensions
             return services;
         }
 
-        public static IServiceCollection AddChannel<T>(this IServiceCollection services)
+        public static IServiceCollection AddChannelService<TChannel, TConsumer>(this IServiceCollection services) 
+            where TChannel : class
+            where TConsumer : BackgroundService
+        {
+            services.AddChannel<TChannel>();
+            services.AddHostedService<TConsumer>();
+
+            return services;
+        }
+
+        private static IServiceCollection AddChannel<T>(this IServiceCollection services)
             where T : class
         {
             var channel = Channel.CreateUnbounded<T>(new UnboundedChannelOptions

@@ -10,6 +10,7 @@ namespace AuctionHub.Infrastructure.UoW
         IAuctionRepository auctionRepository,
         IBidRepository bidRepository,
         IPaymentRepository paymentRepository,
+        INotificationRepository notificationRepository,
         AuctionHubContext context
         ) : IUnitOfWork
     {
@@ -17,6 +18,7 @@ namespace AuctionHub.Infrastructure.UoW
         public IAuctionRepository AuctionRepository { get; private set; } = auctionRepository;
         public IBidRepository BidRepository { get; private set; } = bidRepository;
         public IPaymentRepository PaymentRepository { get; private set; } = paymentRepository;
+        public INotificationRepository NotificationRepository { get; private set; } = notificationRepository;
 
         public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken ct)
         {

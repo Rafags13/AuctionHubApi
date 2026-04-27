@@ -8,5 +8,6 @@ namespace AuctionHub.Domain.Interfaces.Repositories
         IQueryable<TEntity> GetAll();
         Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default);
         Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default);
+        Task<int> CountAsync(CancellationToken ct = default);
     }
 }

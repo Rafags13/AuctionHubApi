@@ -12,6 +12,11 @@ namespace AuctionHub.Infrastructure.Repository
             return context.Set<T>().AnyAsync(predicate, ct);
         }
 
+        public Task<int> CountAsync(CancellationToken ct = default)
+        {
+            return context.Set<T>().CountAsync(ct);
+        }
+
         public Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate, CancellationToken ct = default)
         {
             return context.Set<T>().FirstOrDefaultAsync(predicate, ct);
