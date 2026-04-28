@@ -26,7 +26,10 @@ namespace AuctionHub.Infrastructure.Services.Channel.Auction.Bid.Cancel.Consumer
                     if(!await bidRepository.CancelAsync(@event.Id, stoppingToken))
                     {
                         logger.LogWarning("Falha ao cancelar o lance com ID {BidId}.", @event.Id);
+                        continue;
                     }
+
+                    logger.LogInformation("The bid {BidId} was cancelled at {Time}", @event.Id, DateTime.UtcNow);
                 }
             }
             catch (Exception ex)

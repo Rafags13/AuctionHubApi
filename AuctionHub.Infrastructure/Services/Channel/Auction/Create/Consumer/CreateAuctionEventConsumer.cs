@@ -27,6 +27,8 @@ namespace AuctionHub.Infrastructure.Services.Channel.Auction.Create.Consumer
                     try
                     {
                         await repository.CreateAsync(@event, stoppingToken);
+
+                        logger.LogInformation("A new auction {Title} was created by Seller {SellerId} at time {Time}", @event.Title, @event.SellerId, DateTime.UtcNow);
                     }
                     catch (Exception ex)
                     {

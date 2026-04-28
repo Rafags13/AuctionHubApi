@@ -47,6 +47,7 @@ namespace AuctionHub.Infrastructure.Services.Channel.Auction.Bid.Place.Consumer
                         {
                             await transaction.CommitAsync(stoppingToken);
                             await paymentChannel.DispatchAsync(new ProcessPaymentEvent(paymentId.Value, @event.Amount, bidId.Value, @event.AuctionId), stoppingToken);
+                            logger.LogInformation("A new bid at auction {AuctionId} was created by {BidderId} at {Time}", @event.AuctionId, @event.BidderId, DateTime.UtcNow);
                         }
                     }
                     catch (Exception ex)

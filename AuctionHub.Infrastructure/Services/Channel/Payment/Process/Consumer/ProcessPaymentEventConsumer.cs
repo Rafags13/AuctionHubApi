@@ -38,11 +38,13 @@ namespace AuctionHub.Infrastructure.Services.Channel.Payment.Process.Consumer
                         {
                             await paymentRepository.PayAsync(new PayPaymentRequestDTO(@event.Id, paymentDate), stoppingToken);
                             await awardBidChannel.DispatchAsync(new AwardBidAuctionEvent(@event.AuctionId, @event.Amount), stoppingToken);
+                            logger.LogInformation("The payment {PaymentId} of Bid {BidId} got success at {Time}", @event.Id, @event.BidId, DateTime.UtcNow);
                         }
                         else
                         {
                             await paymentRepository.FailAsync(@event.Id, stoppingToken);
                             await cancelBidChannel.DispatchAsync(new CancelBidAuctionEvent(@event.BidId), stoppingToken);
+                            logger.LogInformation("The payment {PaymentId} of Bid {BidId} got failed at {Time}", @event.Id, @event.BidId, DateTime.UtcNow);
                         }
                     }
                     catch(Exception ex)

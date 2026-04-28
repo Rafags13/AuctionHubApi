@@ -1,5 +1,6 @@
 ﻿using AuctionHub.Domain.DTOs.Auction.UpdatePrice;
 using AuctionHub.Domain.DTOs.Notification.Create;
+using AuctionHub.Domain.Entities;
 using AuctionHub.Domain.Interfaces.Repositories;
 using AuctionHub.Domain.Interfaces.Services.Channel;
 using AuctionHub.Infrastructure.Context;
@@ -57,6 +58,8 @@ namespace AuctionHub.Infrastructure.Services.Channel.Auction.Bid.Award.Consumer
                                 await notificationChannel.DispatchAsync(new CreateNotificationEvent(outbidNotification), stoppingToken);
                             }
                         }
+
+                        logger.LogInformation("Auction {AuctionId} approved the bid of value {BidId} at {Time}", @event.AuctionId, @event.Amount, DateTime.UtcNow);
                     }
                     catch (Exception ex)
                     {

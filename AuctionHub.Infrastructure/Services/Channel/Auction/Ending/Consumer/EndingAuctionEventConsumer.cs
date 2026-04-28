@@ -38,6 +38,12 @@ namespace AuctionHub.Infrastructure.Services.Channel.Auction.Ending.Consumer
                             var wonNotification = new CreateWonAuctionNotificationRequestDTO(winnerInformations.Title, winnerInformations.UserId);
                             await notificationChannel.DispatchAsync(new CreateNotificationEvent(wonNotification), stoppingToken);
                         }
+
+                        logger.LogInformation(
+                            "The auction {AuctionId} was finished with Winner {UserId} at {Time}",
+                            @event.Id,
+                            winnerInformations != null ? winnerInformations.UserId : "No Winners",
+                            DateTime.UtcNow);
                     }
                     catch (Exception ex)
                     {

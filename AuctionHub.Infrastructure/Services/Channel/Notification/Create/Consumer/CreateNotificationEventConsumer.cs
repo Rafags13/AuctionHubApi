@@ -26,6 +26,9 @@ namespace AuctionHub.Infrastructure.Services.Channel.Notification.Create.Consume
                     if(!await notificationRepository.CreateAsync(@event, stoppingToken))
                     {
                         logger.LogError("Falha ao criar a notificação para o evento {Event}.", @event);
+                    } else
+                    {
+                        logger.LogInformation("A new notification of Type {Type} was created to {UserId} at {Time}", @event.Type, @event.UserId, DateTime.UtcNow);
                     }
                 }
             } catch(Exception ex)

@@ -4,10 +4,12 @@ using AuctionHub.WebApi.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddLogging();
+
 builder.Services
     .AddMemoryCache()
     .AddEndpointsApiExplorer()
-    .AddObservability(builder.Host)
+    .AddObservability(builder.Configuration, builder.Host)
     .AddSwaggerSecureDefinition()
     .AddHttpContextAccessor()
     .AddJsonStringEnumConverter()

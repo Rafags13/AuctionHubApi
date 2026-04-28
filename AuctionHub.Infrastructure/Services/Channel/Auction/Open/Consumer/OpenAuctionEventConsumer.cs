@@ -1,4 +1,5 @@
 ﻿using AuctionHub.Domain.DTOs.Notification.Create;
+using AuctionHub.Domain.Entities;
 using AuctionHub.Domain.Interfaces.Repositories;
 using AuctionHub.Domain.Interfaces.Services.Channel;
 using AuctionHub.Infrastructure.Context;
@@ -40,6 +41,8 @@ namespace AuctionHub.Infrastructure.Services.Channel.Auction.Open.Consumer
                             var createAuctionNotification = new CreateStartAuctionNotificationRequestDTO(openAuction.Title, openAuction.UserId);
                             await notificationChannel.DispatchAsync(new CreateNotificationEvent(createAuctionNotification), stoppingToken);
                         }
+
+                        logger.LogInformation("Auction {AuctionId} started at {Time}", @event.Id, DateTime.UtcNow);
                     }
                     catch (Exception ex)
                     {
