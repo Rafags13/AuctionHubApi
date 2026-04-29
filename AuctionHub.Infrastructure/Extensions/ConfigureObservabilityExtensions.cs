@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenTelemetry.Exporter;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
@@ -46,6 +47,13 @@ namespace AuctionHub.Infrastructure.Extensions
                             o.Protocol = OtlpExportProtocol.Grpc;
                         })
                         .AddConsoleExporter();
+                })
+                .WithMetrics(metrics =>
+                {
+                    metrics
+                        .AddAspNetCoreInstrumentation()
+                        .AddRuntimeInstrumentation()
+                        .AddPrometheusExporter();
                 });
             return services;
         }

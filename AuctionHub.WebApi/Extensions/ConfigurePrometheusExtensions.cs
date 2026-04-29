@@ -1,13 +1,10 @@
-﻿using Prometheus;
-
-namespace AuctionHub.WebApi.Extensions
+﻿namespace AuctionHub.WebApi.Extensions
 {
     internal static class ConfigurePrometheusExtensions
     {
-        internal static IApplicationBuilder AddPrometheus(this IApplicationBuilder app)
+        internal static IApplicationBuilder AddPrometheus(this WebApplication app)
         {
-            app.UseHttpMetrics();
-            app.UseMetricServer();
+            app.MapPrometheusScrapingEndpoint();
 
             return app;
         }
