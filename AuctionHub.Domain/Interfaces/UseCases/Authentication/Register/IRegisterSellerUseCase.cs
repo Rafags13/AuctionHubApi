@@ -2,7 +2,7 @@
 using AuctionHub.Domain.Errors.Common.Base;
 using OneOf;
 
-namespace AuctionHub.Domain.Interfaces.UseCases.Authentication.Commands
+namespace AuctionHub.Domain.Interfaces.UseCases.Authentication.Register
 {
     public interface IRegisterSellerUseCase
     {

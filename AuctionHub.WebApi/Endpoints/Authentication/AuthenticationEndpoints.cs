@@ -2,6 +2,7 @@
 using AuctionHub.Domain.DTOs.User.Request.Login;
 using AuctionHub.Domain.Errors.Common.Base;
 using AuctionHub.Domain.Interfaces.UseCases.Authentication.Commands;
+using AuctionHub.Domain.Interfaces.UseCases.Authentication.Register;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuctionHub.WebApi.Endpoints.Authentication

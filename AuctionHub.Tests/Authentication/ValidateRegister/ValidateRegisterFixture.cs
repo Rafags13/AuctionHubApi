@@ -10,9 +10,9 @@ namespace AuctionHub.Tests.Authentication.ValidateRegister
     {
         public IValidateRegisterService Create(ValidateRegisterMocks? mocks = null)
         {
-            var unit = mocks?.UnitOfWork ?? new Mock<IUnitOfWork>();
+            var unitOfWork = mocks?.UnitOfWork ?? new Mock<IUnitOfWork>();
 
-            return new ValidateRegisterService(unit.Object);
+            return new ValidateRegisterService(unitOfWork.Object);
         }
 
         public RequestCreateBidderDTO CreateValidRequest()

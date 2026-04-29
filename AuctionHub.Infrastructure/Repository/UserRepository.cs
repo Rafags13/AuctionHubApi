@@ -29,26 +29,31 @@ namespace AuctionHub.Infrastructure.Repository
 
         public Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken = default)
         {
-            return context.Users.AnyAsync(u => u.Email == email, cancellationToken);
+            return AnyAsync(u => u.Email == email, cancellationToken);
+        }
+
+        public Task<bool> FindByIdAsync(long id, CancellationToken cancellationToken = default)
+        {
+            return AnyAsync(u => u.Id == id, cancellationToken);
         }
 
         public Task<ResponseRefreshTokenDTO?> GetRefreshInformationsAsync(string refreshToken, CancellationToken cancellationToken = default)
         {
-            return context.Users.Where(u => u.RefreshToken == refreshToken && u.ExpirationRefreshToken.HasValue)
+            return GetAll(u => u.RefreshToken == refreshToken && u.ExpirationRefreshToken.HasValue)
                 .Select(u => new ResponseRefreshTokenDTO(u.Id, u.ExpirationRefreshToken.Value))
                 .FirstOrDefaultAsync(cancellationToken);
         }
 
         public Task<ERole?> GetRoleAsync(long id, CancellationToken cancellationToken = default)
         {
-            return context.Users.Where(u => u.Id == id)
+            return GetAll(u => u.Id == id)
                 .Select(u => (ERole?)u.Role)
                 .FirstOrDefaultAsync(cancellationToken);
         }
 
         public Task<RequestGenerateTokenDTO?> GetUserByCredentialsAsync(RequestUserLoginDTO content, CancellationToken cancellationToken = default)
         {
-            return context.Users.Where(u => u.Email == content.Email && u.PasswordHash == content.Password)
+            return GetAll(u => u.Email == content.Email && u.PasswordHash == content.Password)
                 .Select(u => new RequestGenerateTokenDTO(u.Id, u.Name, u.Role, u.Status))
                 .FirstOrDefaultAsync(cancellationToken);
         }
@@ -72,7 +77,7 @@ namespace AuctionHub.Infrastructure.Repository
 
         public async Task<bool> RefreshTokenAsync(RefreshTokenDTO content, long userId, CancellationToken cancellationToken = default)
         {
-            var user = await context.Users.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+            var user = await FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
             if (user == null)
                 return false;
 
@@ -83,8 +88,7 @@ namespace AuctionHub.Infrastructure.Repository
 
         public Task<int> ToggleAsync(RequestToggleUserStatusDTO content, CancellationToken cancellationToken = default)
         {
-            return context.Users
-                .Where(u => u.Id == content.UserId)
+            return GetAll(u => u.Id == content.UserId)
                 .ExecuteUpdateAsync(u => u
                     .SetProperty(p => p.Status, content.Status), cancellationToken);
         }

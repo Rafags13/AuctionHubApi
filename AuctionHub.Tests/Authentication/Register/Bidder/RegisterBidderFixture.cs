@@ -1,6 +1,6 @@
 ﻿using AuctionHub.Application.UseCases.Authentication.Commands;
 using AuctionHub.Domain.DTOs.Authentication.Register.Request;
-using AuctionHub.Domain.Interfaces.UseCases.Authentication.Commands;
+using AuctionHub.Domain.Interfaces.UseCases.Authentication.Register;
 
 namespace AuctionHub.Tests.Authentication.Register.Bidder
 {
