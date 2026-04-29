@@ -5,6 +5,7 @@
   <Project Path="AuctionHub.Application/AuctionHub.Application.csproj" Id="069af647-7755-499f-a55c-8b7443d6dccb" />
   <Project Path="AuctionHub.Domain/AuctionHub.Domain.csproj" Id="7cb68f6e-8c43-4e98-9517-256652e5eae8" />
   <Project Path="AuctionHub.Infrastructure/AuctionHub.Infrastructure.csproj" Id="d370b338-4abb-4391-bb45-c5d361d55371" />
+  <Project Path="AuctionHub.Tests/AuctionHub.Tests.csproj" Id="55f12315-c2e1-4e46-8d39-f86d59f2c858" />
   <Project Path="AuctionHub.WebApi/AuctionHub.WebApi.csproj" Id="a2699116-9999-4fc0-9a8d-e9f3c5088037" />
   <Project Path="docker-compose.dcproj">
     <Build />
