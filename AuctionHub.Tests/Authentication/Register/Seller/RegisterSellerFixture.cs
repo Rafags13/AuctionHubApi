@@ -1,4 +1,5 @@
 ﻿using AuctionHub.Application.UseCases.Authentication.Commands;
+using AuctionHub.Application.UseCases.Authentication.Register;
 using AuctionHub.Domain.DTOs.Authentication.Register.Request;
 using AuctionHub.Domain.Interfaces.UseCases.Authentication.Register;
 
