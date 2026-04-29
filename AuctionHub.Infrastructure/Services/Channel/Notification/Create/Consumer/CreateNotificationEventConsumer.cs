@@ -1,16 +1,19 @@
-﻿using AuctionHub.Domain.Interfaces.Repositories;
+﻿using AuctionHub.Domain.DTOs.Common;
+using AuctionHub.Domain.Interfaces.Repositories;
+using AuctionHub.Infrastructure.Observability;
 using AuctionHub.Infrastructure.Services.Channel.Notification.Create.Producer;
 using AuctionHub.Infrastructure.Services.Channel.Payment.Process.Producer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 using System.Threading.Channels;
 
 namespace AuctionHub.Infrastructure.Services.Channel.Notification.Create.Consumer
 {
     internal sealed class CreateNotificationEventConsumer(
         ILogger<CreateNotificationEventConsumer> logger,
-        ChannelReader<CreateNotificationEvent> channel,
+        ChannelReader<ChannelDTO<CreateNotificationEvent>> channel,
         IServiceScopeFactory serviceScopeFactory
     ) : BackgroundService
     {
@@ -23,12 +26,22 @@ namespace AuctionHub.Infrastructure.Services.Channel.Notification.Create.Consume
 
                 await foreach (var @event in channel.ReadAllAsync(stoppingToken))
                 {
-                    if(!await notificationRepository.CreateAsync(@event, stoppingToken))
+                    var message = @event.Message;
+
+                    if (!await notificationRepository.CreateAsync(message, stoppingToken))
                     {
-                        logger.LogError("Falha ao criar a notificação para o evento {Event}.", @event);
+                        logger.LogError("Falha ao criar a notificação para o evento {Event}.", message);
                     } else
                     {
-                        logger.LogInformation("A new notification of Type {Type} was created to {UserId} at {Time}", @event.Type, @event.UserId, DateTime.UtcNow);
+                        logger.LogInformation("A new notification of Type {Type} was created to {UserId} at {Time}", message.Type, message.UserId, DateTime.UtcNow);
+                        using var activity = Telemetry.ActivitySource.StartActivity(
+                                "CreateNotification",
+                                ActivityKind.Producer,
+                                @event.ParentContext
+                            );
+
+                        activity?.SetTag("notification.type", message.Type);
+                        activity?.SetTag("notification.userId", message.UserId);
                     }
                 }
             } catch(Exception ex)

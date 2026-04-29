@@ -1,12 +1,14 @@
-﻿using AuctionHub.Domain.Interfaces.Services.Channel;
+﻿using AuctionHub.Domain.DTOs.Common;
+using AuctionHub.Domain.Interfaces.Services.Channel;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 using System.Threading.Channels;
 
 namespace AuctionHub.Infrastructure.Services.Channel.Producer
 {
     internal sealed class BaseEventProducer<TRequest>(
         ILogger<BaseEventProducer<TRequest>> logger,
-        ChannelWriter<TRequest> channel) : IBaseEventProducer<TRequest> where TRequest : class
+        ChannelWriter<ChannelDTO<TRequest>> channel) : IBaseEventProducer<TRequest> where TRequest : class
     {
         public async Task DispatchAsync(TRequest @event, CancellationToken ct)
         {
@@ -16,7 +18,7 @@ namespace AuctionHub.Infrastructure.Services.Channel.Producer
 
             try
             {
-                await channel.WriteAsync(@event, ct);
+                await channel.WriteAsync(new ChannelDTO<TRequest>(@event, Activity.Current?.Context ?? default), ct);
 
                 logger.LogInformation(
                     "BaseEventProducer dispatched successfully. MessageType={MessageType}",

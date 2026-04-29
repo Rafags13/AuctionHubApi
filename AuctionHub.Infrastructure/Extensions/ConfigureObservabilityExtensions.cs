@@ -1,9 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Serilog;
 using Serilog.Sinks.Grafana.Loki;
-using OpenTelemetry.Trace;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Configuration;
 
 namespace AuctionHub.Infrastructure.Extensions
 {
@@ -27,16 +29,23 @@ namespace AuctionHub.Infrastructure.Extensions
                 configuration["OPEN_TELEMETRY_URL"] ??
                 throw new ArgumentNullException("Não foi possível encontrar a variável de ambiente OPEN_TELEMETRY_URL");
 
-            services.AddOpenTelemetry()
+            services
+                .AddOpenTelemetry()               
                 .WithTracing(tracing =>
                 {
                     tracing
+                        .SetResourceBuilder(
+                            ResourceBuilder.CreateDefault()
+                                .AddService("AuctionHub.WebApi"))
                         .AddAspNetCoreInstrumentation()
                         .AddHttpClientInstrumentation()
+                        .AddSource("AuctionHub")
                         .AddOtlpExporter(o =>
                         {
                             o.Endpoint = new Uri(openTelemetryUrl);
-                        });
+                            o.Protocol = OtlpExportProtocol.Grpc;
+                        })
+                        .AddConsoleExporter();
                 });
             return services;
         }

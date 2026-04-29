@@ -7,11 +7,15 @@ services:
       dockerfile: AuctionHub.WebApi/Dockerfile
     depends_on:
       - db
+    networks:
+      - observability
 
   db:
     image: postgres:18.3
     volumes:
       - db_data:/var/lib/postgresql
+    networks:
+      - observability
   
   prometheus:
     image: prom/prometheus:latest
@@ -41,6 +45,19 @@ services:
       - ./promtail/promtail-config.yml:/etc/promtail/config.yml
       - /var/log:/var/log
     command: -config.file=/etc/promtail/config.yml
+    networks:
+      - observability
+
+  tempo:
+    image: grafana/tempo:latest
+    container_name: tempo
+    command: [ "-config.file=/etc/tempo.yml" ]
+    volumes:
+      - ./tempo/tempo.yml:/etc/tempo.yml
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+      - "3200:3200"
     networks:
       - observability
 

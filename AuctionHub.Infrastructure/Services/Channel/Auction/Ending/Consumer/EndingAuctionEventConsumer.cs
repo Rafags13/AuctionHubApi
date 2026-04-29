@@ -1,18 +1,21 @@
-﻿using AuctionHub.Domain.DTOs.Notification.Create;
+﻿using AuctionHub.Domain.DTOs.Common;
+using AuctionHub.Domain.DTOs.Notification.Create;
 using AuctionHub.Domain.Interfaces.Repositories;
 using AuctionHub.Domain.Interfaces.Services.Channel;
+using AuctionHub.Infrastructure.Observability;
 using AuctionHub.Infrastructure.Services.Channel.Auction.Ending.Producer;
 using AuctionHub.Infrastructure.Services.Channel.Notification.Create.Producer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 using System.Threading.Channels;
 
 namespace AuctionHub.Infrastructure.Services.Channel.Auction.Ending.Consumer
 {
     internal sealed class EndingAuctionEventConsumer(
         ILogger<EndingAuctionEventConsumer> logger,
-        ChannelReader<EndAuctionEvent> channel,
+        ChannelReader<ChannelDTO<EndAuctionEvent>> channel,
         IServiceScopeFactory serviceScopeFactory
     ) : BackgroundService
     {
@@ -28,10 +31,11 @@ namespace AuctionHub.Infrastructure.Services.Channel.Auction.Ending.Consumer
                 {
                     try
                     {
-                        if(!await repository.EndAsync(@event, stoppingToken))
-                            logger.LogError("Ocorreu um erro ao finalizar o leilão {AuctionId}.", @event.Id);
+                        var message = @event.Message;
+                        if (!await repository.EndAsync(message, stoppingToken))
+                            logger.LogError("Ocorreu um erro ao finalizar o leilão {AuctionId}.", message.Id);
 
-                        var winnerInformations = await repository.GetWinnerAsync(@event.Id, stoppingToken);
+                        var winnerInformations = await repository.GetWinnerAsync(message.Id, stoppingToken);
 
                         if(winnerInformations != null)
                         {
@@ -41,9 +45,18 @@ namespace AuctionHub.Infrastructure.Services.Channel.Auction.Ending.Consumer
 
                         logger.LogInformation(
                             "The auction {AuctionId} was finished with Winner {UserId} at {Time}",
-                            @event.Id,
+                            message.Id,
                             winnerInformations != null ? winnerInformations.UserId : "No Winners",
                             DateTime.UtcNow);
+
+                        using var activity = Telemetry.ActivitySource.StartActivity(
+                                "EndingAuction",
+                                ActivityKind.Producer,
+                                @event.ParentContext
+                            );
+
+                        activity?.SetTag("auction.id", message.Id);
+                        activity?.SetTag("auction.winnerId", winnerInformations?.UserId);
                     }
                     catch (Exception ex)
                     {
