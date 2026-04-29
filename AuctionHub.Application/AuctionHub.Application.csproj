@@ -15,4 +15,8 @@
     <ProjectReference Include="..\AuctionHub.Infrastructure\AuctionHub.Infrastructure.csproj" />
   </ItemGroup>
 
+	<ItemGroup>
+		<InternalsVisibleTo Include="AuctionHub.Tests" />
+	</ItemGroup>
+
 </Project>

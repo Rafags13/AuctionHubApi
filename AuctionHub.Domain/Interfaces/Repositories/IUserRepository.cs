@@ -19,5 +19,6 @@ namespace AuctionHub.Domain.Interfaces.Repositories
         Task<int> ToggleAsync(RequestToggleUserStatusDTO content, CancellationToken cancellationToken = default);
         Task<ERole?> GetRoleAsync(long id, CancellationToken cancellationToken = default);
         Task<UserProfileDTO?> GetUserProfileAsync(long id, CancellationToken cancellationToken = default);
+        Task<bool> FindByIdAsync(long id, CancellationToken cancellationToken = default);
     }
 }
