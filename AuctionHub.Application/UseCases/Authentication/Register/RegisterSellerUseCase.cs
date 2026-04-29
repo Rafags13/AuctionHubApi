@@ -5,10 +5,10 @@ using AuctionHub.Domain.Helpers;
 using AuctionHub.Domain.Interfaces.Services.Authentication.Password;
 using AuctionHub.Domain.Interfaces.Services.User.Register;
 using AuctionHub.Domain.Interfaces.UoW;
-using AuctionHub.Domain.Interfaces.UseCases.Authentication.Commands;
+using AuctionHub.Domain.Interfaces.UseCases.Authentication.Register;
 using OneOf;
 
-namespace AuctionHub.Application.UseCases.Authentication.Commands
+namespace AuctionHub.Application.UseCases.Authentication.Register
 {
     internal sealed class RegisterSellerUseCase(
         IUnitOfWork unitOfWork,

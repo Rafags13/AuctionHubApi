@@ -13,7 +13,7 @@ namespace AuctionHub.Application.UseCases.User.Commands
     {
         public async Task<OneOf<bool, BaseError>> ToggleAsync(RequestToggleUserStatusDTO content, CancellationToken cancellationToken = default)
         {
-            if (!await unitOfWork.UserRepository.AnyAsync(u => u.Id == content.UserId, cancellationToken))
+            if (!await unitOfWork.UserRepository.FindByIdAsync(content.UserId, cancellationToken))
                 return new UserNotFoundError();
 
             if(await unitOfWork.UserRepository.ToggleAsync(content, cancellationToken) <= 0)

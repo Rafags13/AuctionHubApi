@@ -32,4 +32,8 @@
     <ProjectReference Include="..\AuctionHub.Domain\AuctionHub.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+  	<InternalsVisibleTo Include="AuctionHub.Tests" />
+  </ItemGroup>
+
 </Project>
