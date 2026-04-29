@@ -10,9 +10,11 @@ using AuctionHub.Domain.Helpers.Autentication;
 using AuctionHub.Domain.Interfaces.Services.Channel;
 using AuctionHub.Domain.Interfaces.UoW;
 using AuctionHub.Domain.Interfaces.UseCases.Auction.Bid.Commands;
+using AuctionHub.Infrastructure.Observability;
 using AuctionHub.Infrastructure.Services.Channel.Auction.Bid.Place.Producer;
 using Microsoft.AspNetCore.Http;
 using OneOf;
+using System.Diagnostics;
 
 namespace AuctionHub.Application.UseCases.Auction.Bid.Create.Commands
 {
@@ -32,6 +34,13 @@ namespace AuctionHub.Application.UseCases.Auction.Bid.Create.Commands
             content.SetBidderId(currentUserId!.Value);
 
             await bidProducer.DispatchAsync(new BidAuctionEvent(content), cancellationToken);
+
+            using var activity = Telemetry.ActivitySource.StartActivity(
+                "PublishBidAuction",
+                ActivityKind.Producer
+            );
+
+            activity?.SetTag("event.type", "BidAuction");
 
             return true;
         }

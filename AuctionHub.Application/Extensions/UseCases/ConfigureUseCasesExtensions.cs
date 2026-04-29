@@ -1,6 +1,7 @@
 ﻿using AuctionHub.Application.Extensions.UseCases.Auction;
 using AuctionHub.Application.Extensions.UseCases.Auction.Bid;
 using AuctionHub.Application.Extensions.UseCases.Authentication;
+using AuctionHub.Application.Extensions.UseCases.Notification;
 using AuctionHub.Application.Extensions.UseCases.User;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,7 +14,8 @@ namespace AuctionHub.Application.Extensions.UseCases
             return services
                 .AddAuthenticationUseCases()
                 .AddUserUseCases()
-                .AddAuctionUseCases();
+                .AddAuctionUseCases()
+                .AddNotificationUseCases();
         }
     }
 }

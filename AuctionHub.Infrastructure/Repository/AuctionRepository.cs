@@ -16,13 +16,15 @@ namespace AuctionHub.Infrastructure.Repository
 {
     internal sealed class AuctionRepository(AuctionHubContext context, ICachingService cachingService) : BaseRepository<Auction>(context), IAuctionRepository
     {
-        public async Task<bool> CreateAsync(RequestCreateAuctionDTO content, CancellationToken cancellationToken = default)
+        public async Task<long?> CreateAsync(RequestCreateAuctionDTO content, CancellationToken cancellationToken = default)
         {
             var auction = Auction.Create(content);
 
             await context.Auctions.AddAsync(auction, cancellationToken);
 
-            return await context.SaveChangesAsync(cancellationToken) > 0;
+            await context.SaveChangesAsync(cancellationToken);
+
+            return auction?.Id;
         }
 
         public async Task<bool> EndAsync(EndingAuctionResponseDTO content, CancellationToken cancellationToken = default)
@@ -83,7 +85,7 @@ namespace AuctionHub.Infrastructure.Repository
 
         public async Task<AuctionDetailsResponseDTO?> GetAsync(long id, CancellationToken cancellationToken = default)
         {
-            var cacheKey = $"Auction_{id}";
+            var cacheKey = $"AuctionDetails_{id}";
             var cachedAuction = cachingService.Get<AuctionDetailsResponseDTO>(cacheKey);
             if (cachedAuction != null)
                 return cachedAuction;
@@ -107,6 +109,43 @@ namespace AuctionHub.Infrastructure.Repository
                 cachingService.Set(cacheKey, auction, CachingConstants.DEFAULT_EXPIRATION_CACHING);
 
             return auction;
+        }
+
+        public Task<AuctionNotificationInformationsDTO?> GetOpenAsync(long id, CancellationToken cancellationToken = default)
+        {
+            return GetAll(a => a.Id == id)
+                .Select(a => new AuctionNotificationInformationsDTO(a.SellerId, a.Title))
+                .FirstOrDefaultAsync(cancellationToken);
+        }
+
+        public async Task<AuctionNotificationInformationsDTO?> GetOutBidAsync(long id, CancellationToken cancellationToken = default)
+        {
+            var cacheKey = $"AuctionOutBid_{id}";
+            var cachedAuction = cachingService.Get<AuctionNotificationInformationsDTO>(cacheKey);
+            if (cachedAuction != null)
+                return cachedAuction;
+
+            var auction = await GetAll(a => a.Id == id)
+                .Select(a => new AuctionNotificationInformationsDTO(
+                    a.Bids
+                        .Where(b => b.Status == EBidStatus.OUTBID)
+                        .Max(b => b.BidderId),
+                    a.Title))
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (auction != null)
+                cachingService.Set(cacheKey, auction, CachingConstants.DEFAULT_EXPIRATION_CACHING);
+
+            return auction;
+        }
+
+        public Task<AuctionNotificationInformationsDTO?> GetWinnerAsync(long id, CancellationToken cancellationToken = default)
+        {
+            return GetAll(a => a.Id == id && a.WinnerId.HasValue)
+                .Select(a => new AuctionNotificationInformationsDTO(
+                    a.WinnerId!.Value,
+                    a.Title))
+                .FirstOrDefaultAsync(cancellationToken);
         }
     }
 }

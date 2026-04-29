@@ -56,5 +56,9 @@ namespace AuctionHub.Domain.Entities
             ExpirationRefreshToken = content.ExpiresAt;
         }
         #endregion
+
+        #region [Navigations]
+        public ICollection<Notification> Notifications { get; private set; } = [];
+        #endregion
     }
 }

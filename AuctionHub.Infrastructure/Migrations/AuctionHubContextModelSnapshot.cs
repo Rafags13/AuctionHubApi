@@ -111,6 +111,41 @@ namespace AuctionHub.Infrastructure.Migrations
                     b.ToTable("Bids");
                 });
 
+            modelBuilder.Entity("AuctionHub.Domain.Entities.Notification", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime?>("ReadAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Notifications");
+                });
+
             modelBuilder.Entity("AuctionHub.Domain.Entities.Payment", b =>
                 {
                     b.Property<long>("Id")
@@ -243,6 +278,17 @@ namespace AuctionHub.Infrastructure.Migrations
                     b.Navigation("Bidder");
                 });
 
+            modelBuilder.Entity("AuctionHub.Domain.Entities.Notification", b =>
+                {
+                    b.HasOne("AuctionHub.Domain.Entities.User", "User")
+                        .WithMany("Notifications")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("AuctionHub.Domain.Entities.Payment", b =>
                 {
                     b.HasOne("AuctionHub.Domain.Entities.Auction", "Auction")
@@ -265,6 +311,11 @@ namespace AuctionHub.Infrastructure.Migrations
             modelBuilder.Entity("AuctionHub.Domain.Entities.Auction", b =>
                 {
                     b.Navigation("Bids");
+                });
+
+            modelBuilder.Entity("AuctionHub.Domain.Entities.User", b =>
+                {
+                    b.Navigation("Notifications");
                 });
 #pragma warning restore 612, 618
         }

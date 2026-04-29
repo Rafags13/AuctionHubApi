@@ -9,9 +9,11 @@ using AuctionHub.Domain.Helpers.Autentication;
 using AuctionHub.Domain.Interfaces.Services.Channel;
 using AuctionHub.Domain.Interfaces.UoW;
 using AuctionHub.Domain.Interfaces.UseCases.Auction.Create.Commands;
+using AuctionHub.Infrastructure.Observability;
 using AuctionHub.Infrastructure.Services.Channel.Auction.Create.Producer;
 using Microsoft.AspNetCore.Http;
 using OneOf;
+using System.Diagnostics;
 
 namespace AuctionHub.Application.UseCases.Auction.Create.Commands
 {
@@ -34,6 +36,13 @@ namespace AuctionHub.Application.UseCases.Auction.Create.Commands
                 return error;
 
             await auctionProducer.DispatchAsync(new CreateAuctionEvent(content), cancellationToken);
+
+            using var activity = Telemetry.ActivitySource.StartActivity(
+                "PublishCreateAuction",
+                ActivityKind.Producer
+            );
+
+            activity?.SetTag("event.type", "CreateAuction");
 
             return true;
         }
