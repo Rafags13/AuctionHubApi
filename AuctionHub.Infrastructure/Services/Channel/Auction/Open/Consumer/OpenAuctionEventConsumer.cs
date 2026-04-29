@@ -1,20 +1,24 @@
-﻿using AuctionHub.Domain.DTOs.Notification.Create;
+﻿using AuctionHub.Domain.DTOs.Common;
+using AuctionHub.Domain.DTOs.Notification.Create;
+using AuctionHub.Domain.Entities;
 using AuctionHub.Domain.Interfaces.Repositories;
 using AuctionHub.Domain.Interfaces.Services.Channel;
 using AuctionHub.Infrastructure.Context;
+using AuctionHub.Infrastructure.Observability;
 using AuctionHub.Infrastructure.Repository;
 using AuctionHub.Infrastructure.Services.Channel.Auction.Open.Producer;
 using AuctionHub.Infrastructure.Services.Channel.Notification.Create.Producer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 using System.Threading.Channels;
 
 namespace AuctionHub.Infrastructure.Services.Channel.Auction.Open.Consumer
 {
     internal sealed class OpenAuctionEventConsumer(
         ILogger<OpenAuctionEventConsumer> logger,
-        ChannelReader<OpenAuctionEvent> channel,
+        ChannelReader<ChannelDTO<OpenAuctionEvent>> channel,
         IServiceScopeFactory serviceScopeFactory
     ) : BackgroundService
     {
@@ -30,16 +34,27 @@ namespace AuctionHub.Infrastructure.Services.Channel.Auction.Open.Consumer
                 {
                     try
                     {
-                        if (!await repository.OpenAsync(@event, stoppingToken))
-                            logger.LogError("Ocorreu um erro ao abrir o leilão {AuctionId}.", @event.Id);
+                        var message = @event.Message;
+                        if (!await repository.OpenAsync(message, stoppingToken))
+                            logger.LogError("Ocorreu um erro ao abrir o leilão {AuctionId}.", message.Id);
 
-                        var openAuction = await repository.GetOpenAsync(@event.Id, stoppingToken);
+                        var openAuction = await repository.GetOpenAsync(message.Id, stoppingToken);
 
                         if(openAuction != null)
                         {
                             var createAuctionNotification = new CreateStartAuctionNotificationRequestDTO(openAuction.Title, openAuction.UserId);
                             await notificationChannel.DispatchAsync(new CreateNotificationEvent(createAuctionNotification), stoppingToken);
                         }
+
+                        logger.LogInformation("Auction {AuctionId} started at {Time}", message.Id, DateTime.UtcNow);
+
+                        using var activity = Telemetry.ActivitySource.StartActivity(
+                                "OpenAuction",
+                                ActivityKind.Producer,
+                                @event.ParentContext
+                            );
+
+                        activity?.SetTag("auction.id", message.Id);
                     }
                     catch (Exception ex)
                     {

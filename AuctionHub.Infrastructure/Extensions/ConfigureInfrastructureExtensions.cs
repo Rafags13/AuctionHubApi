@@ -1,5 +1,6 @@
 ﻿using AuctionHub.Domain.Constants.Authentication.Login;
 using AuctionHub.Domain.Constants.Authentication.Password;
+using AuctionHub.Domain.DTOs.Common;
 using AuctionHub.Domain.Interfaces.Repositories;
 using AuctionHub.Domain.Interfaces.Services.Channel;
 using AuctionHub.Domain.Interfaces.UoW;
@@ -80,14 +81,14 @@ namespace AuctionHub.Infrastructure.Extensions
 
         private static IServiceCollection ConfigureBackgrounServices(this IServiceCollection services)
         {
-            services.AddChannelService<CreateAuctionEvent, CreateAuctionEventConsumer>();
-            services.AddChannelService<EndAuctionEvent, EndingAuctionEventConsumer>();
-            services.AddChannelService<OpenAuctionEvent, OpenAuctionEventConsumer>();
-            services.AddChannelService<BidAuctionEvent, BidAuctionEventConsumer>();
-            services.AddChannelService<ProcessPaymentEvent, ProcessPaymentEventConsumer>();
-            services.AddChannelService<AwardBidAuctionEvent, AwardBidAuctionEventConsumer>();
-            services.AddChannelService<CancelBidAuctionEvent, CancelBidAuctionEventConsumer>();
-            services.AddChannelService<CreateNotificationEvent, CreateNotificationEventConsumer>();
+            services.AddChannelService<ChannelDTO<CreateAuctionEvent>, CreateAuctionEventConsumer>();
+            services.AddChannelService<ChannelDTO<EndAuctionEvent>, EndingAuctionEventConsumer>();
+            services.AddChannelService<ChannelDTO<OpenAuctionEvent>, OpenAuctionEventConsumer>();
+            services.AddChannelService<ChannelDTO<BidAuctionEvent>, BidAuctionEventConsumer>();
+            services.AddChannelService<ChannelDTO<ProcessPaymentEvent>, ProcessPaymentEventConsumer>();
+            services.AddChannelService<ChannelDTO<AwardBidAuctionEvent>, AwardBidAuctionEventConsumer>();
+            services.AddChannelService<ChannelDTO<CancelBidAuctionEvent>, CancelBidAuctionEventConsumer>();
+            services.AddChannelService<ChannelDTO<CreateNotificationEvent>, CreateNotificationEventConsumer>();
 
             services.AddHostedService<EndAuctionBackgroundService>();
             services.AddHostedService<OpenAuctionBackgroundService>();

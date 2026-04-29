@@ -16,13 +16,15 @@ namespace AuctionHub.Infrastructure.Repository
 {
     internal sealed class AuctionRepository(AuctionHubContext context, ICachingService cachingService) : BaseRepository<Auction>(context), IAuctionRepository
     {
-        public async Task<bool> CreateAsync(RequestCreateAuctionDTO content, CancellationToken cancellationToken = default)
+        public async Task<long?> CreateAsync(RequestCreateAuctionDTO content, CancellationToken cancellationToken = default)
         {
             var auction = Auction.Create(content);
 
             await context.Auctions.AddAsync(auction, cancellationToken);
 
-            return await context.SaveChangesAsync(cancellationToken) > 0;
+            await context.SaveChangesAsync(cancellationToken);
+
+            return auction?.Id;
         }
 
         public async Task<bool> EndAsync(EndingAuctionResponseDTO content, CancellationToken cancellationToken = default)
